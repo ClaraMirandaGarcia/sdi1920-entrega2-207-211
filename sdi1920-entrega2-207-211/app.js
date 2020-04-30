@@ -5,9 +5,15 @@ let crypto = require('crypto');
 let path = require('path');
 let fs = require('fs');
 let https = require('https');
-let mongo = require('mongodb');
 let swig = require('swig');
+
 let bodyParser = require('body-parser');
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({extended: true}));
+
+let mongo = require('mongodb');
+let gestorBD = require("./modules/gestorBD");
+gestorBD.init(app, mongo);
 // Variables
 app.set('port', 8081);
 app.set('db', 'mongodb://admin:207sdi@tiendamusica-shard-00-00-lpbsd.mongodb.net:27017,tiendamusica-shard-00-01-lpbsd.mongodb.net:27017,tiendamusica-shard-00-02-lpbsd.mongodb.net:27017/test?ssl=true&replicaSet=tiendamusica-shard-0&authSource=admin&retryWrites=true&w=majority');
@@ -16,9 +22,7 @@ app.set('crypto', crypto);
 
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
-
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({extended: true}));
+require("./routes/users.js")(app, swig, gestorBD);
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
