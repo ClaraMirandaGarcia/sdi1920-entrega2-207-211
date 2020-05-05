@@ -33,9 +33,25 @@ let gestorBD = require("./modules/gestorBD");
 //Routers
 {
   let indexRouter = require('./routes/index');
-  let usersRouter = require('./routes/users');
   app.use('/', indexRouter);
-  app.use('/users', usersRouter);
+  // routerUserSession
+  {
+    let routerUserSession = express.Router();
+    routerUserSession.use(function(req, res, next) {
+      console.log("routerUserSession");
+      if (req.session.user) {
+        next();
+      } else {
+        res.redirect("/login");
+      }
+    });
+    //TODO
+    app.use('/asd', routerUserSession);
+  }
+  // routerFriendRequest
+  {
+    
+  }
 }
 
 //Controllers
