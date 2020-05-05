@@ -16,16 +16,29 @@ module.exports = function (app, swig, gestorBD) {
   app.post('/user', function (req, res) {
     let hash = app.get("crypto").createHmac('sha256', app.get('key'))
         .update(req.body.password).digest('hex');
+    let confirm = app.get("crypto").createHmac('sha256', app.get('key'))
+        .update(req.body.passwordConfirmation).digest('hex');
+    if (confirm !== hash){
+      res.redirect("/signup?message=Las contraseñas no coinciden" + "&messageType=alert-danger");
+      return;
+    }
     let user = {
       email: req.body.email,
       password: hash
     };
-    gestorBD.insertUser(user, function (id) {
-      if (id == null) {
-        res.redirect("/signup?message=Error al registrar usuario")
-      } else {
-        res.redirect("/signup?message=Nuevo usuario registrado");
+    let criteria = { email: user.email};
+    gestorBD.getUsers(criteria, function (users) {
+      if (users == null || users.length === 0){
+        gestorBD.insertUser(user, function (id) {
+          if (id == null) {
+            res.redirect("/signup?message=Error al registrar usuario")
+          } else {
+            res.redirect("/signup?message=Nuevo usuario registrado");
+          }
+        });
+      }else{
+        res.redirect("/signup?message=Email ya registrado" + "&messageType=alert-danger")
       }
     });
-  })
+  });
 };

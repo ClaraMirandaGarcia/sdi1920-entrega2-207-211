@@ -55,3 +55,5 @@ https.createServer({
 }, app).listen(app.get('port'), function () {
   console.log("Servidor activo");
 });
+
+module.exports = app;
