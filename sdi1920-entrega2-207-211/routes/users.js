@@ -9,9 +9,33 @@ router.get('/', function(req, res, next) {
 module.exports = router;
 
 module.exports = function (app, swig, gestorBD) {
+  app.get("/login" , function (req, res) {
+    let respuesta = swig.renderFile('views/blogin.html', {});
+    res.send(respuesta);
+  });
   app.get("/signup", function (req, res) {
     let response = swig.renderFile('views/bsignup.html',{});
     res.send(response);
+  });
+  app.post("/login", function (req,res) {
+    let hash = app.get("crypto").createHmac('sha256', app.get('key'))
+        .update(req.body.password).digest('hex');
+    let criteria = {
+      email: req.body.email,
+      password: hash
+    };
+    gestorBD.getUsers(criteria, function (users) {
+      if (users == null || users.length == 0) {
+        req.session.usuario = null;
+        res.redirect("/login" +
+            "?message=Email o password incorrecto" +
+            "&messageType=alert-danger ");
+      } else {
+        req.session.usuario = users[0].email;
+        //TODO redirect to "lista todos los usuarios de la aplicación"
+        res.redirect("/index");
+      }
+    });
   });
   app.post('/user', function (req, res) {
     let hash = app.get("crypto").createHmac('sha256', app.get('key'))

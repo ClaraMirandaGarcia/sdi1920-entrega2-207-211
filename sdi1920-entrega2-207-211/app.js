@@ -1,6 +1,13 @@
 let express = require('express');
 let app = express();
 
+let expressSession = require('express-session');
+app.use(expressSession({
+  secret: 'abcdefg',
+  resave: true,
+  saveUninitialized: true
+}));
+
 let crypto = require('crypto');
 let path = require('path');
 let fs = require('fs');
