@@ -9,6 +9,10 @@ router.get('/', function(req, res, next) {
 module.exports = router;
 
 module.exports = function (app, swig, gestorBD) {
+  app.get('/logout', function (req, res) {
+    req.session.usuario = null;
+    res.redirect("/login?Desconectado con exito");
+  });
   app.get("/signup", function (req, res) {
     let response = swig.renderFile('views/bsignup.html',{});
     res.send(response);
