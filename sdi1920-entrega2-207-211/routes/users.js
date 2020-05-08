@@ -4,8 +4,13 @@ module.exports = function (app, swig, gestorBD) {
     app.get("/users", function (req, res) {
 
         let criterio = {};
+
         if (req.query.busqueda != null) {
-            criterio = {"nombre": req.query.busqueda};
+            criterio = {
+                $or: [{"name": {$regex: ".*" + req.query.busqueda + ".*", $options: 'i'}},
+                    {"surname": {$regex: ".*" + req.query.busqueda + ".*", $options: 'i'}},
+                    {"email": {$regex: ".*" + req.query.busqueda + ".*", $options: 'i'}}]
+            };
         }
         let pg = parseInt(req.query.pg);
         if (req.query.pg == null) {
@@ -36,6 +41,10 @@ module.exports = function (app, swig, gestorBD) {
         });
     });
 
+
+
+
+
     app.get("/signup", function (req, res) {
         let response = swig.renderFile('views/bsignup.html', {});
         res.send(response);
@@ -47,10 +56,7 @@ module.exports = function (app, swig, gestorBD) {
         res.send(respuesta);
     });
 
-    app.get("/signup", function (req, res) {
-        let response = swig.renderFile('views/bsignup.html', {});
-        res.send(response);
-    });
+
 
     app.post("/login", function (req, res) {
         let hash = app.get("crypto").createHmac('sha256', app.get('key'))

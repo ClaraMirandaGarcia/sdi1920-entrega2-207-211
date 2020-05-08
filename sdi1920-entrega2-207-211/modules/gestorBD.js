@@ -9,23 +9,29 @@ module.exports = {
     obtainUsersPg: function (criterio, pg, funcionCallback) {
         this.mongo.MongoClient.connect(this.app.get('db'), function (err, db) {
             if (err) {
+                console.log('AAAAAAAAAAAAAAAA');
                 funcionCallback(null);
             } else {
                 let collection = db.collection('users');
-                collection.count(function(err, count){
-                    collection.find(criterio).skip( (pg-1)*5 ).limit( 5 )
-                        .toArray(function(err, canciones) {
+                let totalResults = collection.find(criterio);
+
+                totalResults.count(function(err, count){
+                    totalResults.skip( (pg-1)*5 ).limit( 5 )
+                        .toArray(function(err, usuarios) {
                             if (err) {
                                 funcionCallback(null);
+                                console.log('BBBBBBBBBBB');
+                                console.log(err);
                             } else {
-                                funcionCallback(canciones, count);
+                                funcionCallback(usuarios, count);
                             }
-                         db.close();
-                    });
+                            db.close();
+                        });
                 });
             }
         });
     },
+
     insertUser: function (user, funcionCallback) {
         this.mongo.MongoClient.connect(this.app.get('db'), function (err, db) {
             if (err) {
