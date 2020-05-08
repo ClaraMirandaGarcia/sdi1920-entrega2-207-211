@@ -5,19 +5,22 @@ module.exports = {
         this.mongo = mongo;
         this.app = app;
     },
-    obtainUsers: function (criterio, funcionCallback) {
+    obtainUsersPg: function (criterio, funcionCallback) {
         this.mongo.MongoClient.connect(this.app.get('db'), function (err, db) {
             if (err) {
                 funcionCallback(null);
             } else {
                 let collection = db.collection('users');
-                collection.find(criterio).toArray(function (err, users) {
-                    if (err) {
-                        funcionCallback(null);
-                    } else {
-                        funcionCallback(users);
-                    }
-                    db.close();
+                collection.count(function(err, count){
+                    collection.find(criterio).skip( (pg-1)*5 ).limit( 5 )
+                        .toArray(function(err, canciones) {
+                            if (err) {
+                                funcionCallback(null);
+                            } else {
+                                funcionCallback(canciones, count);
+                            }
+                         db.close();
+                    });
                 });
             }
         });

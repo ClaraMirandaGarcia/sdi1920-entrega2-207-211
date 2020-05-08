@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+
+{% block titulo %} Welcome {% endblock %}
+
+{% block contenido_principal %}
+
+{% if user %}
+<h2>Bienvenid@ {{user.email}}</h2>
+{% else %}
+<h2>Bienvenid@</h2>
+{% endif %}
+{% endblock %}

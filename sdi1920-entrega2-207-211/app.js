@@ -1,7 +1,15 @@
+//Modules
 let express = require('express');
 let app = express();
 
-//Modules
+let expressSession = require('express-session');
+app.use(expressSession({
+  secret: 'abcdefg',
+  resave: true,
+  saveUninitialized: true
+}));
+
+
 let crypto = require('crypto');
 let path = require('path');
 let fs = require('fs');
@@ -10,6 +18,8 @@ let swig = require('swig');
 let bodyParser = require('body-parser');
 let mongo = require('mongodb');
 let gestorBD = require("./modules/gestorBD");
+
+
 
 //BodyParser
 {
@@ -25,11 +35,11 @@ let gestorBD = require("./modules/gestorBD");
 // Variables
 {
   app.set('port', 8081);
-  //app.set('db', 'mongodb://admin:207sdi@tiendamusica-shard-00-00-lpbsd.mongodb.net:27017,tiendamusica-shard-00-01-lpbsd.mongodb.net:27017,tiendamusica-shard-00-02-lpbsd.mongodb.net:27017/test?ssl=true&replicaSet=tiendamusica-shard-0&authSource=admin&retryWrites=true&w=majority');
-  //app.set('key', 'abcdefg');
+  app.set('db', 'mongodb://admin:207sdi@tiendamusica-shard-00-00-lpbsd.mongodb.net:27017,tiendamusica-shard-00-01-lpbsd.mongodb.net:27017,tiendamusica-shard-00-02-lpbsd.mongodb.net:27017/test?ssl=true&replicaSet=tiendamusica-shard-0&authSource=admin&retryWrites=true&w=majority');
+  app.set('key', 'abcdefg');
 
-  app.set('db', 'mongodb://admin:<password>@tiendamusica-shard-00-00-gkefy.mongodb.net:27017,tiendamusica-shard-00-01-gkefy.mongodb.net:27017,tiendamusica-shard-00-02-gkefy.mongodb.net:27017/test?ssl=true&replicaSet=tiendamusica-shard-0&authSource=admin&retryWrites=true&w=majority');
-  app.set('key', 'sdi');
+  //app.set('db', 'mongodb://admin:<password>@tiendamusica-shard-00-00-gkefy.mongodb.net:27017,tiendamusica-shard-00-01-gkefy.mongodb.net:27017,tiendamusica-shard-00-02-gkefy.mongodb.net:27017/test?ssl=true&replicaSet=tiendamusica-shard-0&authSource=admin&retryWrites=true&w=majority');
+  //app.set('key', 'sdi');
 
   //mongodb://admin:<password>@tiendamusica-shard-00-00-gkefy.mongodb.net:27017,tiendamusica-shard-00-01-gkefy.mongodb.net:27017,tiendamusica-shard-00-02-gkefy.mongodb.net:27017/test?ssl=true&replicaSet=tiendamusica-shard-0&authSource=admin&retryWrites=true&w=majority
 
@@ -38,11 +48,18 @@ let gestorBD = require("./modules/gestorBD");
 
 //Routers
 {
-  let indexRouter = require('./routes/index');
+  //let indexRouter = require('./routes/index');
   let usersRouter = require('./routes/users');
-  app.use('/', indexRouter);
+  //app.use('/', indexRouter);
   app.use('/users', usersRouter);
 }
+
+//default -> index
+app.get("/", function(req, res) {
+  let respuesta = swig.renderFile('views/bhome.html', {user : req.session.usuario});
+  res.send(respuesta);
+});
+
 
 //Controllers
 {
@@ -72,6 +89,7 @@ app.use(function(err, req, res, next) {
   res.render('error');
 });
 
+
 //lanzar el servidor
 https.createServer({
   key: fs.readFileSync('certificates/alice.key'),
@@ -79,5 +97,8 @@ https.createServer({
 }, app).listen(app.get('port'), function () {
   console.log("Servidor activo");
 });
+
+
+
 
 module.exports = app;
