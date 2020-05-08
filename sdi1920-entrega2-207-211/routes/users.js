@@ -2,6 +2,7 @@ module.exports = function (app, swig, gestorBD) {
 
 
     app.get("/users", function (req, res) {
+        
         let criterio = {};
         if (req.query.busqueda != null) {
             criterio = {"nombre": req.query.busqueda};
