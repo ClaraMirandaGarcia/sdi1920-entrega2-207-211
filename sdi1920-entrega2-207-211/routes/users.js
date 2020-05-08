@@ -2,12 +2,11 @@ module.exports = function (app, swig, gestorBD) {
 
 
     app.get("/users", function (req, res) {
-        
+
         let criterio = {};
         if (req.query.busqueda != null) {
             criterio = {"nombre": req.query.busqueda};
         }
-
         let pg = parseInt(req.query.pg);
         if (req.query.pg == null) {
             pg = 1;
@@ -35,7 +34,11 @@ module.exports = function (app, swig, gestorBD) {
                 res.send(respuesta);
             }
         });
+    });
 
+    app.get("/signup", function (req, res) {
+        let response = swig.renderFile('views/bsignup.html', {});
+        res.send(response);
     });
 
 
@@ -70,6 +73,7 @@ module.exports = function (app, swig, gestorBD) {
         });
     });
 
+
     app.post('/user', function (req, res) {
         let hash = app.get("crypto").createHmac('sha256', app.get('key'))
             .update(req.body.password).digest('hex');
@@ -81,21 +85,21 @@ module.exports = function (app, swig, gestorBD) {
         }
         let user = {
             email: req.body.email,
+            name: req.body.nombre,
+            surname: req.body.apellidos,
             password: hash
         };
         let criteria = {email: user.email};
         gestorBD.getUsers(criteria, function (users) {
-                if (users == null || users.length === 0) {
-                    gestorBD.insertUser(user, function (id) {
-                        if (id == null) {
-                            res.redirect("/signup?message=Error al registrar usuario")
-                        } else {
-                            res.redirect("/signup?message=Nuevo usuario registrado");
-                        }
-
-                    });
-                }
+            if (users == null || users.length === 0) {
+                gestorBD.insertUser(user, function (id) {
+                    if (id == null) {
+                        res.redirect("/signup?message=Error al registrar usuario")
+                    } else {
+                        res.redirect("/signup?message=Nuevo usuario registrado");
+                    }
+                });
             }
-        );
+        });
     });
-};
+}
