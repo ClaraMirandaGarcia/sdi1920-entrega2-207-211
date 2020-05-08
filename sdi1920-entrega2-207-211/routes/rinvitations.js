@@ -1,8 +1,8 @@
 module.exports = function (app, swig, gestorBD) {
 
-    app.get("/send/invitation/:id", function (req, res) {
+    app.get("/invitation/send/:id", function (req, res) {
         let criterio_to = {
-            "_id": gestorBD.mongo.ObjectID(req.params.id)
+            _id: gestorBD.mongo.ObjectID(req.params.id)
         };
 
         if (typeof req.session.usuario == "undefined" || req.session.usuario == null) {
@@ -10,16 +10,26 @@ module.exports = function (app, swig, gestorBD) {
             //redirect?
         } else {
             let user_from = req.session.usuario;
+
+            console.log(user_from._id.toString());
+            let user_from_id = gestorBD.mongo.ObjectID(user_from._id.toString());
+            console.log(user_from)
+
             gestorBD.getUsers(criterio_to, function (users) {
                 if (users == null || users.length == 0) {
                     //redirect?
 
                 } else {
                     let user_to = users[0];
+
+                    console.log(user_from._id);
+
                     let invitation = {
-                        userFrom: user_from,
-                        userTo: user_to.email
+                        userFrom: user_from_id,
+                        userTo: user_to._id
                     }
+
+                    //check if there is an invitation already (both ways)
 
                     //check if it's the same user
                     if (user_from.email == user_to.email) {
@@ -37,8 +47,43 @@ module.exports = function (app, swig, gestorBD) {
                     }
                 }
             })
-
         }
+    });
+
+
+    //invitaciones para x
+    app.get("/invitations", function(req, res){
+        let criterio = {"user_to": req.session.usuario};
+
+        let pg = parseInt(req.query.pg);
+        if (req.query.pg == null) {
+            pg = 1;
+        }
+
+        gestorBD.obtainInvitationsPg(criterio, pg, function (users, total) {
+            if (users == null) {
+                //manejo error
+                res.send("Error al listar ");
+            } else {
+                let ultimaPg = total / 5;
+                if (total % 5 > 0) { // Sobran decimales
+                    ultimaPg = ultimaPg + 1;
+                }
+                let paginas = []; // paginas mostrar
+                for (let i = pg - 2; i <= pg + 2; i++) {
+                    if (i > 0 && i <= ultimaPg) {
+                        paginas.push(i);
+                    }
+                }
+
+                let respuesta = swig.renderFile('views/binvitations.html', {
+                    invitations: invitations,
+                    paginas: paginas,
+                    actual: pg
+                });
+                res.send(respuesta);
+            }
+        });
     });
 
 }
