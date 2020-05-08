@@ -25,8 +25,14 @@ let gestorBD = require("./modules/gestorBD");
 // Variables
 {
   app.set('port', 8081);
-  app.set('db', 'mongodb://admin:207sdi@tiendamusica-shard-00-00-lpbsd.mongodb.net:27017,tiendamusica-shard-00-01-lpbsd.mongodb.net:27017,tiendamusica-shard-00-02-lpbsd.mongodb.net:27017/test?ssl=true&replicaSet=tiendamusica-shard-0&authSource=admin&retryWrites=true&w=majority');
-  app.set('key', 'abcdefg');
+  //app.set('db', 'mongodb://admin:207sdi@tiendamusica-shard-00-00-lpbsd.mongodb.net:27017,tiendamusica-shard-00-01-lpbsd.mongodb.net:27017,tiendamusica-shard-00-02-lpbsd.mongodb.net:27017/test?ssl=true&replicaSet=tiendamusica-shard-0&authSource=admin&retryWrites=true&w=majority');
+  //app.set('key', 'abcdefg');
+
+  app.set('db', 'mongodb://admin:<password>@tiendamusica-shard-00-00-gkefy.mongodb.net:27017,tiendamusica-shard-00-01-gkefy.mongodb.net:27017,tiendamusica-shard-00-02-gkefy.mongodb.net:27017/test?ssl=true&replicaSet=tiendamusica-shard-0&authSource=admin&retryWrites=true&w=majority');
+  app.set('key', 'sdi');
+
+  //mongodb://admin:<password>@tiendamusica-shard-00-00-gkefy.mongodb.net:27017,tiendamusica-shard-00-01-gkefy.mongodb.net:27017,tiendamusica-shard-00-02-gkefy.mongodb.net:27017/test?ssl=true&replicaSet=tiendamusica-shard-0&authSource=admin&retryWrites=true&w=majority
+
   app.set('crypto', crypto);
 }
 
