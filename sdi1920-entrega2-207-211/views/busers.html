@@ -33,15 +33,20 @@
             <th>Nombre</th>
             <th>Apellidos</th>
             <th>Email</th>
+            <th class="col-md-1"></th>
         </tr>
         </thead>
 
         <tbody>
         {% for user in users %}
         <tr>
+
             <td>{{user.name}}</td>
             <td>{{user.surname}}</td>
             <td>{{user.email}}</td>
+            <!-- Friendship invitation -->
+            <td><a href="/send/invitation/{{user._id.toString()}}">Agregar amigo</a></td>
+
         </tr>
         {% endfor %}
         </tbody>
