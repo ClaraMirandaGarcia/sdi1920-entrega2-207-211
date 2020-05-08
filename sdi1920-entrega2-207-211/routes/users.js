@@ -2,8 +2,13 @@ module.exports = function (app, swig, gestorBD) {
 
 
     app.get("/users", function (req, res) {
-        
-        let criterio = {};
+
+        criterio = {
+            $or: [{"name": {$regex: ".*" + req.query.busqueda + ".*", $options: 'i'}},
+                {"surname": {$regex: ".*" + req.query.busqueda + ".*", $options: 'i'}},
+                {"email": {$regex: ".*" + req.query.busqueda + ".*", $options: 'i'}}]
+        };
+
         if (req.query.busqueda != null) {
             criterio = {"nombre": req.query.busqueda};
         }
