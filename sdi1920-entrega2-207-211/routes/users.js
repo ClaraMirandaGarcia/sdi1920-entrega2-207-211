@@ -24,6 +24,8 @@ module.exports = function (app, swig, gestorBD) {
     }
     let user = {
       email: req.body.email,
+      name: req.body.nombre,
+      surname: req.body.apellidos,
       password: hash
     };
     let criteria = { email: user.email};
