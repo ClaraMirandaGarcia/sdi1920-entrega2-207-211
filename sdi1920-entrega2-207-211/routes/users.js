@@ -117,6 +117,8 @@ module.exports = function (app, swig, gestorBD) {
             res.redirect("/signup?message=Nuevo usuario registrado");
           }
         });
+      }else{
+        res.redirect("/signup?message=Email ya registrado" + "&messageType=alert-danger")
       }
     });
   });
