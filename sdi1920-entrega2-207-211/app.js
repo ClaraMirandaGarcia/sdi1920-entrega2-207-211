@@ -60,21 +60,16 @@ routerUsuarioToken.use(function (req, res, next) {
         res.json({acceso: false, mensaje: 'No hay Token'});
     }
 });
-
+app.use("/api/friendships", routerUsuarioToken);
 
 //BodyParser
-
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended: true}));
-
-
 //Mongodb
-
 gestorBD.init(app, mongo);
 
 
 // Variables
-
 app.set('port', 8081);
 app.set('db', 'mongodb://admin:207sdi@tiendamusica-shard-00-00-lpbsd.mongodb.net:27017,tiendamusica-shard-00-01-lpbsd.mongodb.net:27017,tiendamusica-shard-00-02-lpbsd.mongodb.net:27017/test?ssl=true&replicaSet=tiendamusica-shard-0&authSource=admin&retryWrites=true&w=majority');
 app.set('clave', 'abcdefg');
@@ -82,7 +77,6 @@ app.set('crypto', crypto);
 
 
 //Routers
-//require
 require('./routes/rinvitations')(app, swig, gestorBD);
 require('./routes/rfriendships')(app, swig, gestorBD);
 require('./routes/rapimessages')(app, gestorBD);
