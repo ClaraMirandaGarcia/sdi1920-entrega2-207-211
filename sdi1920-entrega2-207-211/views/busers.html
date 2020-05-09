@@ -1,0 +1,71 @@
+{% extends "base.html" %}
+
+{% block titulo %} Listar usuario {% endblock %}
+
+{% block contenido_principal %}
+
+<h2>Usuarios</h2>
+
+<div class="row">
+    <div id="custom-search-input ">
+        <form method="get" action="/users" >
+            <div
+                    class="input-group col-xs-8 col-sm-6 col-md-4 col-lg-5 pull-right">
+                <input type="text" class="search-query form-control"
+                       placeholder="Nombre, apellidos o email del usuario" name="busqueda"/>
+                <span class="input-group-btn">
+					<button class="btn" type="submit">
+						<span class="glyphicon glyphicon-search"></span>
+					</button>
+				</span>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="row">
+    <!-- http://librosweb.es/libro/bootstrap_3/capitulo_2/tipos_de_rejillas.html -->
+    <!-- Inicio del Bloque canción -->
+
+    <table class="table table-hover" id="tableUsers">
+        <thead>
+        <tr>
+            <th>Nombre</th>
+            <th>Apellidos</th>
+            <th>Email</th>
+            <th class="col-md-1"></th>
+        </tr>
+        </thead>
+
+        <tbody>
+        {% for user in users %}
+        <tr>
+
+            <td>{{user.name}}</td>
+            <td>{{user.surname}}</td>
+            <td>{{user.email}}</td>
+            <!-- Friendship invitation -->
+            <td><a href="/invitation/send/{{user._id.toString()}}">Agregar amigo</a></td>
+
+        </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+    <!-- Fin del Bloque usuarios -->
+</div>
+
+<!-- Paginación mostrar la actual y 2 anteriores y dos siguientes -->
+<div class="row text-center">
+    <ul class="pagination">
+        {% for pagina in paginas %}
+        <li class="page-item" id="pi-{{ pagina }}">
+            <a class="page-link" href="/users?pg={{ pagina }}">{{ pagina }}</a>
+        </li>
+        {% endfor %}
+        <script>
+            $("#pi-" + "{{ actual }}").addClass("active");
+        </script>
+    </ul>
+</div>
+
+{% endblock %}

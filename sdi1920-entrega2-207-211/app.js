@@ -1,7 +1,24 @@
+//Modules
 let express = require('express');
 let app = express();
 
-//Modules
+app.use(function(req, res, next) {
+  res.header("Access-Control-Allow-Origin", "*");
+  res.header("Access-Control-Allow-Credentials", "true");
+  res.header("Access-Control-Allow-Methods", "POST, GET, DELETE, UPDATE, PUT");
+  res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept, token");
+  // Debemos especificar todas las headers que se aceptan. Content-Type , token
+  next();
+});
+
+let expressSession = require('express-session');
+app.use(expressSession({
+  secret: 'abcdefg',
+  resave: true,
+  saveUninitialized: true
+}));
+
+
 let crypto = require('crypto');
 let path = require('path');
 let fs = require('fs');
@@ -10,6 +27,8 @@ let swig = require('swig');
 let bodyParser = require('body-parser');
 let mongo = require('mongodb');
 let gestorBD = require("./modules/gestorBD");
+
+
 
 //BodyParser
 {
@@ -54,33 +73,19 @@ let gestorBD = require("./modules/gestorBD");
   }
 }
 
+//default -> index
+app.get("/", function(req, res) {
+  let respuesta = swig.renderFile('views/bhome.html', {user : req.session.usuario});
+  res.send(respuesta);
+});
+
+
 //Controllers
 {
   require("./routes/users.js")(app, swig, gestorBD);
 }
 
-// view engine setup
-{
-  app.set('views', path.join(__dirname, 'views'));
-  app.set('view engine', 'pug') ;
-  app.use(express.static(path.join(__dirname, 'public')));
-}
 
-// catch 404 and forward to error handler
-app.use(function(req, res, next) {
-  next(createError(404));
-});
-
-// error handler
-app.use(function(err, req, res, next) {
-  // set locals, only providing error in development
-  res.locals.message = err.message;
-  res.locals.error = req.app.get('env') === 'development' ? err : {};
-
-  // render the error page
-  res.status(err.status || 500);
-  res.render('error');
-});
 
 //lanzar el servidor
 https.createServer({
@@ -89,5 +94,8 @@ https.createServer({
 }, app).listen(app.get('port'), function () {
   console.log("Servidor activo");
 });
+
+
+
 
 module.exports = app;
