@@ -10,10 +10,8 @@ module.exports = function (app, swig, gestorBD) {
             //redirect?
         } else {
             let user_from = req.session.usuario;
-
-            console.log(user_from._id.toString());
             let user_from_id = gestorBD.mongo.ObjectID(user_from._id.toString());
-            console.log(user_from)
+
 
             gestorBD.getUsers(criterio_to, function (users) {
                 if (users == null || users.length == 0) {
@@ -80,12 +78,8 @@ module.exports = function (app, swig, gestorBD) {
                     gestorBD.getUsers(criterio, function (users) {
                         if (users == null || users.length == 0) {
                             //redirect?
-                            console.log('NUL');
                         } else {
-                            console.log(users);
-
                             if (invitations.length != 0) {
-
                                 let ultimaPg = total / 5;
                                 if (total % 5 > 0) { // Sobran decimales
                                     ultimaPg = ultimaPg + 1;
@@ -102,7 +96,6 @@ module.exports = function (app, swig, gestorBD) {
                                     paginas: paginas,
                                     actual: pg
                                 });
-
                                 res.send(respuesta);
 
                             } else {
@@ -111,8 +104,6 @@ module.exports = function (app, swig, gestorBD) {
 
                         }
                     });
-
-
                 }
             });
         }
@@ -120,18 +111,52 @@ module.exports = function (app, swig, gestorBD) {
     ;
 
 
-    function getAllUsersFromIdPag(arrayOfIDs, pg, callback) {
-        if (arrayOfIDs.length == 0) {
-            callback([]);
-        } else {
-            let criterio = {
-                $or: arrayOfIDs.map((identifier) => {
-                    return {_id: gestorBD.mongo.ObjectID(identifier.toString())}
-                })
+
+    app.get("/invitation/accept/:id", function (req, res) {
+
+        if (typeof req.session.usuario == "undefined" || req.session.usuario == null) {
+            res.send("El usuario no está en sesión");
+            //redirect?
+        } else{
+            //erase petition
+            console.log(req.session.usuario);
+            console.log(req.session.usuario._id);
+            let userTo= gestorBD.mongo.ObjectID(req.session.usuario._id.toString());
+            let userFrom = gestorBD.mongo.ObjectID(req.params.id.toString());
+
+            let criterioPetition = {
+                userTo: userTo,
+                userFrom: userFrom
             }
-            gestorBD.obtenerUsuariosPag(criterio, pg, callback);
+
+            gestorBD.eraseInvitation(criterioPetition, function(invitation){
+                if(invitation == null){
+                    res.send(respuesta);
+                } else{
+
+                    // insert friendship
+                    let friendship = {
+                        userFrom: userFrom,
+                        userTo: userTo
+                    }
+
+                    console.log(friendship);
+
+                    gestorBD.insertFriendship(friendship, function (id) {
+                        if (id == null) {
+                            //there was an error adding?
+                        } else {
+                            //redirect to list of friends.
+                            res.redirect("/users");
+                        }
+                    })
+
+                    // redirect
+                }
+            })
         }
-    }
+
+    });
 
 
 }
