@@ -25,4 +25,10 @@ public class PO_PrivateView extends PO_NavView{
 		driver.findElement(boton).click();	
 	}
 	
+	public static void clickMenuOption(final WebDriver driver, final String typeMenu, final String textMenu,
+			final String typeOption, final String textOption) {
+		PO_View.checkElement(driver, typeMenu, textMenu).get(0).click();
+		PO_View.checkElement(driver, typeOption, textOption).get(0).click();
+	}
+
 }

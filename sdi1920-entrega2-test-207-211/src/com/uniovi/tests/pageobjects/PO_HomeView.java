@@ -23,6 +23,14 @@ public class PO_HomeView extends PO_NavView {
 			//Esperamos a que se cargue el saludo de bienvenida en Español
 			PO_HomeView.checkWelcome(driver, locale1);
 	}
+	
+	static public void loginForm(WebDriver driver, String classStr,String buttonName, String loginText, String emailp, String passwordp) {
+		// Vamos al formulario de logueo.
+		PO_HomeView.clickOption(driver, loginText, classStr, buttonName);
+		// Rellenamos el formulario
+		PO_LoginView.fillForm(driver, emailp, passwordp);
+		PO_View.checkElement(driver, "text", emailp);
+	}
 
 
 }
