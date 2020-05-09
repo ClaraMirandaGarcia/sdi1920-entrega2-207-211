@@ -75,8 +75,7 @@ module.exports = function (app, swig, gestorBD) {
                     "&messageType=alert-danger ");
             } else {
                 req.session.usuario = users[0];
-                //TODO redirect to "lista todos los usuarios de la aplicación"
-                res.redirect("/index");
+                res.redirect("/users");
             }
         });
     });
