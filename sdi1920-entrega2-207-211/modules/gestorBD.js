@@ -5,6 +5,32 @@ module.exports = {
         this.mongo = mongo;
         this.app = app;
     },
+
+    //users
+    obtainUsersPg: function (criterio, pg, funcionCallback) {
+        this.mongo.MongoClient.connect(this.app.get('db'), function (err, db) {
+            if (err) {
+               funcionCallback(null);
+            } else {
+                let collection = db.collection('users');
+                let totalResults = collection.find(criterio);
+
+                totalResults.count(function(err, count){
+                    totalResults.skip( (pg-1)*5 ).limit( 5 )
+                        .toArray(function(err, usuarios) {
+                            if (err) {
+                                funcionCallback(null);
+                                console.log(err);
+                            } else {
+                                funcionCallback(usuarios, count);
+                            }
+                            db.close();
+                        });
+                });
+            }
+        });
+    },
+
     insertUser: function (user, funcionCallback) {
         this.mongo.MongoClient.connect(this.app.get('db'), function (err, db) {
             if (err) {
@@ -35,6 +61,104 @@ module.exports = {
                         funcionCallback(usuarios);
                     }
                     db.close();
+                });
+            }
+        });
+    },
+
+    //Friendship invitation
+    insertInvitation: function (invitation, funcionCallback) {
+        this.mongo.MongoClient.connect(this.app.get('db'), function (err, db) {
+            if (err) {
+                funcionCallback(null);
+            } else {
+                let collection = db.collection('invitations');
+                collection.insert(invitation, function (err, result) {
+                    if (err) {
+                        funcionCallback(null);
+                    } else {
+                        funcionCallback(result.ops[0]._id);
+                    }
+                    db.close();
+                });
+            }
+        });
+    },
+
+    obtainInvitationsPg : function(criterio, pg, funcionCallback){
+        this.mongo.MongoClient.connect(this.app.get('db'), function(err, db) {
+            if (err) {
+                funcionCallback(null);
+            } else {
+                let collection = db.collection('invitations');
+                collection.count(function(err, count){
+                    collection.find(criterio).skip( (pg-1)*4 ).limit( 4 )
+                        .toArray(function(err, invitations) {
+                            if (err) {
+                                funcionCallback(null);
+                            } else {
+                                funcionCallback(invitations, count);
+                            }
+                            db.close();
+                        });
+                });
+            }
+        });
+    },
+
+    eraseInvitation: function (criterio, funcionCallback) {
+        this.mongo.MongoClient.connect(this.app.get('db'), function (err, db) {
+            if (err) {
+                funcionCallback(null);
+            } else {
+                let collection = db.collection('invitations');
+                collection.remove(criterio, function (err, result) {
+                    if (err) {
+                        funcionCallback(null);
+                    } else {
+                        funcionCallback(result);
+                    }
+                    db.close();
+                });
+            }
+        });
+    },
+
+    //Friendship
+    insertFriendship: function (friendship, funcionCallback) {
+        this.mongo.MongoClient.connect(this.app.get('db'), function (err, db) {
+            if (err) {
+                funcionCallback(null);
+            } else {
+                let collection = db.collection('friendship');
+                collection.insert(friendship, function (err, result) {
+                    if (err) {
+                        funcionCallback(null);
+                    } else {
+                        funcionCallback(result.ops[0]._id);
+                    }
+                    db.close();
+                });
+            }
+        });
+    },
+
+    obtainFriendshipsPg : function(criterio, pg, funcionCallback){
+        this.mongo.MongoClient.connect(this.app.get('db'), function(err, db) {
+            if (err) {
+                funcionCallback(null);
+            } else {
+                let collection = db.collection('friendship');
+                collection.count(function(err, count){
+                    collection.find(criterio).skip( (pg-1)*4 ).limit( 4 )
+                        .toArray(function(err, friendship) {
+                            if (err) {
+                                funcionCallback(null);
+                            } else {
+                                funcionCallback(friendship, count);
+                            }
+                            db.close();
+                        });
                 });
             }
         });
