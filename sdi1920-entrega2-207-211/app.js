@@ -51,8 +51,6 @@ let gestorBD = require("./modules/gestorBD");
 
 //Routers
 {
-  let indexRouter = require('./routes/index');
-  app.use('/', indexRouter);
   // routerUserSession
   {
     let routerUserSession = express.Router();
@@ -85,6 +83,8 @@ app.get("/", function(req, res) {
 //Controllers
 {
   require("./routes/users.js")(app, swig, gestorBD);
+  require("./routes/rinvitations.js")(app, swig, gestorBD);
+  require("./routes/rfriendships.js")(app, swig, gestorBD);
 }
 
 
