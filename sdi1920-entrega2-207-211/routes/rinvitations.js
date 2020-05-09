@@ -120,18 +120,4 @@ module.exports = function (app, swig, gestorBD) {
     ;
 
 
-    function getAllUsersFromIdPag(arrayOfIDs, pg, callback) {
-        if (arrayOfIDs.length == 0) {
-            callback([]);
-        } else {
-            let criterio = {
-                $or: arrayOfIDs.map((identifier) => {
-                    return {_id: gestorBD.mongo.ObjectID(identifier.toString())}
-                })
-            }
-            gestorBD.obtenerUsuariosPag(criterio, pg, callback);
-        }
-    }
-
-
 }
