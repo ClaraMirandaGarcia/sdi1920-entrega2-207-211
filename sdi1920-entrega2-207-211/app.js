@@ -87,15 +87,29 @@ routerUsuarioToken.use(function (req, res, next) {
 
 //Routers
 {
-    //let indexRouter = require('./routes/index');
-    let usersRouter = require('./routes/users');
     require('./routes/rinvitations')(app, swig, gestorBD);
     require('./routes/rfriendships')(app, swig, gestorBD);
     require('./routes/rapimessages')(app, gestorBD);
-
-
-    //app.use('/', indexRouter);
-    //app.use('/users', usersRouter);
+  // routerUserSession
+  {
+    let routerUserSession = express.Router();
+    routerUserSession.use(function(req, res, next) {
+      console.log("routerUserSession");
+      if (req.session.usuario) {
+        next();
+      } else {
+        res.redirect("/login");
+      }
+    });
+    app.use('/users', routerUserSession);
+    app.use('/invitations', routerUserSession);
+    app.use('/invitation', routerUserSession);
+    app.use('/friendships', routerUserSession);
+  }
+  // routerFriendRequest
+  {
+    
+  }
 }
 
 
@@ -109,7 +123,7 @@ app.get("/", function (req, res) {
 
 //Controllers
 {
-    require("./routes/users.js")(app, swig, gestorBD);
+  require("./routes/users.js")(app, swig, gestorBD);
 }
 
 
