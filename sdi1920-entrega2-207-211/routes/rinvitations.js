@@ -116,11 +116,8 @@ module.exports = function (app, swig, gestorBD) {
 
         if (typeof req.session.usuario == "undefined" || req.session.usuario == null) {
             res.send("El usuario no está en sesión");
-            //redirect?
         } else{
             //erase petition
-            console.log(req.session.usuario);
-            console.log(req.session.usuario._id);
             let userTo= gestorBD.mongo.ObjectID(req.session.usuario._id.toString());
             let userFrom = gestorBD.mongo.ObjectID(req.params.id.toString());
 
@@ -139,9 +136,6 @@ module.exports = function (app, swig, gestorBD) {
                         userFrom: userFrom,
                         userTo: userTo
                     }
-
-                    console.log(friendship);
-
                     gestorBD.insertFriendship(friendship, function (id) {
                         if (id == null) {
                             //there was an error adding?
@@ -150,12 +144,9 @@ module.exports = function (app, swig, gestorBD) {
                             res.redirect("/users");
                         }
                     })
-
-                    // redirect
                 }
             })
         }
-
     });
 
 
