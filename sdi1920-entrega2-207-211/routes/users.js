@@ -82,7 +82,7 @@ module.exports = function (app, swig, gestorBD) {
             "&messageType=alert-danger "
         );
       } else {
-        req.session.usuario = users[0];
+        req.session.usuario = users[0].email;
         res.redirect("/users");
       }
     });
