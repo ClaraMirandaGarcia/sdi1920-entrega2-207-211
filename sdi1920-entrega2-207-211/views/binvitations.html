@@ -1,12 +1,8 @@
 {% extends "base.html" %}
-
-{% block titulo %} Listar usuario {% endblock %}
-
+{% block titulo %} Invitationes de amistad {% endblock %}
 {% block contenido_principal %}
 
-<h2>Invitaciones de amistad</h2>
-
-
+<h2>Invitaciones de amistad recibidas</h2>
 <div class="row">
     <!-- http://librosweb.es/libro/bootstrap_3/capitulo_2/tipos_de_rejillas.html -->
     <!-- Inicio del Bloque canción -->
@@ -27,9 +23,7 @@
 
             <td>{{user.name}}</td>
             <td>{{user.surname}}</td>
-            <td>{{user.email}}</td>
-            <!-- Friendship invitation -->
-            <td><a href="/invitation/send/{{user._id.toString()}}">Agregar amigo</a></td>
+            <!-- acept invitation -->
 
         </tr>
         {% endfor %}
@@ -43,7 +37,7 @@
     <ul class="pagination">
         {% for pagina in paginas %}
         <li class="page-item" id="pi-{{ pagina }}">
-            <a class="page-link" href="/users?pg={{ pagina }}">{{ pagina }}</a>
+            <a class="page-link" href="/invitations?pg={{ pagina }}">{{ pagina }}</a>
         </li>
         {% endfor %}
         <script>

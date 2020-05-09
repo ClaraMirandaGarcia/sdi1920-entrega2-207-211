@@ -52,38 +52,86 @@ module.exports = function (app, swig, gestorBD) {
 
 
     //invitaciones para x
-    app.get("/invitations", function(req, res){
-        let criterio = {"user_to": req.session.usuario};
+    app.get("/invitations", function (req, res) {
 
-        let pg = parseInt(req.query.pg);
-        if (req.query.pg == null) {
-            pg = 1;
-        }
+            let criterio = {
+                userTo: gestorBD.mongo.ObjectID(req.session.usuario._id.toString())
+            };
 
-        gestorBD.obtainInvitationsPg(criterio, pg, function (users, total) {
-            if (users == null) {
-                //manejo error
-                res.send("Error al listar ");
-            } else {
-                let ultimaPg = total / 5;
-                if (total % 5 > 0) { // Sobran decimales
-                    ultimaPg = ultimaPg + 1;
-                }
-                let paginas = []; // paginas mostrar
-                for (let i = pg - 2; i <= pg + 2; i++) {
-                    if (i > 0 && i <= ultimaPg) {
-                        paginas.push(i);
-                    }
-                }
-
-                let respuesta = swig.renderFile('views/binvitations.html', {
-                    invitations: invitations,
-                    paginas: paginas,
-                    actual: pg
-                });
-                res.send(respuesta);
+            let pg = parseInt(req.query.pg);
+            if (req.query.pg == null) {
+                pg = 1;
             }
-        });
-    });
+
+
+            gestorBD.obtainInvitationsPg(criterio, pg, function (invitations, total) {
+                if (invitations == null) {
+                    //manejo error
+                    res.send("Error al listar ");
+                } else {
+
+
+                    let criterio = {
+                        $or: invitations.map((i) => {
+                            return {_id: gestorBD.mongo.ObjectID(i.userFrom.toString())}
+                        })
+                    }
+
+                    gestorBD.getUsers(criterio, function (users) {
+                        if (users == null || users.length == 0) {
+                            //redirect?
+                            console.log('NUL');
+                        } else {
+                            console.log(users);
+
+                            if (invitations.length != 0) {
+
+                                let ultimaPg = total / 5;
+                                if (total % 5 > 0) { // Sobran decimales
+                                    ultimaPg = ultimaPg + 1;
+                                }
+                                let paginas = []; // paginas mostrar
+                                for (let i = pg - 2; i <= pg + 2; i++) {
+                                    if (i > 0 && i <= ultimaPg) {
+                                        paginas.push(i);
+                                    }
+                                }
+
+                                let respuesta = swig.renderFile('views/binvitations.html', {
+                                    users: users,
+                                    paginas: paginas,
+                                    actual: pg
+                                });
+
+                                res.send(respuesta);
+
+                            } else {
+                                console.log('Este usuario no tiene invitaciones de amistad');
+                            }
+
+                        }
+                    });
+
+
+                }
+            });
+        }
+    )
+    ;
+
+
+    function getAllUsersFromIdPag(arrayOfIDs, pg, callback) {
+        if (arrayOfIDs.length == 0) {
+            callback([]);
+        } else {
+            let criterio = {
+                $or: arrayOfIDs.map((identifier) => {
+                    return {_id: gestorBD.mongo.ObjectID(identifier.toString())}
+                })
+            }
+            gestorBD.obtenerUsuariosPag(criterio, pg, callback);
+        }
+    }
+
 
 }
