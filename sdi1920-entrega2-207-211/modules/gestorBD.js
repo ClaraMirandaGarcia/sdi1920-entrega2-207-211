@@ -142,4 +142,25 @@ module.exports = {
             }
         });
     },
+
+    obtainFriendshipsPg : function(criterio, pg, funcionCallback){
+        this.mongo.MongoClient.connect(this.app.get('db'), function(err, db) {
+            if (err) {
+                funcionCallback(null);
+            } else {
+                let collection = db.collection('friendship');
+                collection.count(function(err, count){
+                    collection.find(criterio).skip( (pg-1)*4 ).limit( 4 )
+                        .toArray(function(err, friendship) {
+                            if (err) {
+                                funcionCallback(null);
+                            } else {
+                                funcionCallback(friendship, count);
+                            }
+                            db.close();
+                        });
+                });
+            }
+        });
+    }
 };
