@@ -53,6 +53,8 @@ let gestorBD = require("./modules/gestorBD");
 {
   //let indexRouter = require('./routes/index');
   let usersRouter = require('./routes/users');
+  require('./routes/rinvitations')(app, swig, gestorBD);
+
   //app.use('/', indexRouter);
   //app.use('/users', usersRouter);
 }

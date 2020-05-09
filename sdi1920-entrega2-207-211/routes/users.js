@@ -7,9 +7,11 @@ module.exports = function (app, swig, gestorBD) {
 
         if (req.query.busqueda != null) {
             criterio = {
-                $or: [{"name": {$regex: ".*" + req.query.busqueda + ".*", $options: 'i'}},
+                $or: [
+                    {"name": {$regex: ".*" + req.query.busqueda + ".*", $options: 'i'}},
                     {"surname": {$regex: ".*" + req.query.busqueda + ".*", $options: 'i'}},
-                    {"email": {$regex: ".*" + req.query.busqueda + ".*", $options: 'i'}}]
+                    {"email": {$regex: ".*" + req.query.busqueda + ".*", $options: 'i'}}
+                    ]
             };
         }
         let pg = parseInt(req.query.pg);
@@ -72,7 +74,7 @@ module.exports = function (app, swig, gestorBD) {
                     "?message=Email o password incorrecto" +
                     "&messageType=alert-danger ");
             } else {
-                req.session.usuario = users[0].email;
+                req.session.usuario = users[0];
                 //TODO redirect to "lista todos los usuarios de la aplicación"
                 res.redirect("/index");
             }

@@ -9,8 +9,7 @@ module.exports = {
     obtainUsersPg: function (criterio, pg, funcionCallback) {
         this.mongo.MongoClient.connect(this.app.get('db'), function (err, db) {
             if (err) {
-                console.log('AAAAAAAAAAAAAAAA');
-                funcionCallback(null);
+               funcionCallback(null);
             } else {
                 let collection = db.collection('users');
                 let totalResults = collection.find(criterio);
@@ -20,7 +19,6 @@ module.exports = {
                         .toArray(function(err, usuarios) {
                             if (err) {
                                 funcionCallback(null);
-                                console.log('BBBBBBBBBBB');
                                 console.log(err);
                             } else {
                                 funcionCallback(usuarios, count);
@@ -65,5 +63,44 @@ module.exports = {
                 });
             }
         });
-    }
+    },
+
+    insertInvitation: function (invitation, funcionCallback) {
+        this.mongo.MongoClient.connect(this.app.get('db'), function (err, db) {
+            if (err) {
+                funcionCallback(null);
+            } else {
+                let collection = db.collection('invitations');
+                collection.insert(invitation, function (err, result) {
+                    if (err) {
+                        funcionCallback(null);
+                    } else {
+                        funcionCallback(result.ops[0]._id);
+                    }
+                    db.close();
+                });
+            }
+        });
+    },
+
+    obtainInvitationsPg : function(criterio, pg, funcionCallback){
+        this.mongo.MongoClient.connect(this.app.get('db'), function(err, db) {
+            if (err) {
+                funcionCallback(null);
+            } else {
+                let collection = db.collection('invitations');
+                collection.count(function(err, count){
+                    collection.find(criterio).skip( (pg-1)*4 ).limit( 4 )
+                        .toArray(function(err, invitations) {
+                            if (err) {
+                                funcionCallback(null);
+                            } else {
+                                funcionCallback(invitations, count);
+                            }
+                            db.close();
+                        });
+                });
+            }
+        });
+    },
 };
