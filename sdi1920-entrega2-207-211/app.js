@@ -58,14 +58,16 @@ let gestorBD = require("./modules/gestorBD");
     let routerUserSession = express.Router();
     routerUserSession.use(function(req, res, next) {
       console.log("routerUserSession");
-      if (req.session.user) {
+      if (req.session.usuario) {
         next();
       } else {
         res.redirect("/login");
       }
     });
-    //TODO
-    app.use('/asd', routerUserSession);
+    app.use('/users', routerUserSession);
+    app.use('/invitations', routerUserSession);
+    app.use('/invitation', routerUserSession);
+    app.use('/friendships', routerUserSession);
   }
   // routerFriendRequest
   {
