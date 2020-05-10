@@ -63,7 +63,8 @@ module.exports = function (app, swig, gestorBD) {
                             let respuesta = swig.renderFile('views/bfriendships.html', {
                                 users: final,
                                 paginas: paginas,
-                                actual: pg
+                                actual: pg,
+                                loggedIn: !!req.session.usuario,
                             });
 
                             res.send(respuesta);

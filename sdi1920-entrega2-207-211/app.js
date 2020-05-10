@@ -103,7 +103,7 @@ require("./routes/users.js")(app, swig, gestorBD);
 
 //default -> index
 app.get("/", function (req, res) {
-    let respuesta = swig.renderFile('views/bhome.html', {user: req.session.usuario});
+    let respuesta = swig.renderFile('views/bhome.html', {user: req.session.usuario,loggedIn: !!req.session.usuario,});
     res.send(respuesta);
 });
 
