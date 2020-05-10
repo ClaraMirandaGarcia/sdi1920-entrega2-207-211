@@ -52,7 +52,6 @@ module.exports = function (app, swig, gestorBD) {
     //invitaciones para x
     app.get("/invitations", function (req, res) {
 
-        console.log(req.session.usuario);
             let criterio = {
                 userTo: gestorBD.mongo.ObjectID(req.session.usuario._id.toString())
             };
@@ -97,7 +96,8 @@ module.exports = function (app, swig, gestorBD) {
                                 let respuesta = swig.renderFile('views/binvitations.html', {
                                     users: users,
                                     paginas: paginas,
-                                    actual: pg
+                                    actual: pg,
+                                    loggedIn: !!req.session.usuario,
                                 });
                                 res.send(respuesta);
 

@@ -47,6 +47,7 @@ module.exports = function (app, swig, gestorBD) {
           users: users,
           paginas: paginas,
           actual: pg,
+          loggedIn: !!req.session.usuario,
         });
         res.send(respuesta);
       }
@@ -54,12 +55,12 @@ module.exports = function (app, swig, gestorBD) {
   });
 
   app.get("/signup", function (req, res) {
-    let response = swig.renderFile("views/bsignup.html", {});
+    let response = swig.renderFile("views/bsignup.html", {loggedIn: !!req.session.usuario,});
     res.send(response);
   });
 
   app.get("/login", function (req, res) {
-    let respuesta = swig.renderFile("views/blogin.html", {});
+    let respuesta = swig.renderFile("views/blogin.html", {loggedIn: !!req.session.usuario,});
     res.send(respuesta);
   });
 
