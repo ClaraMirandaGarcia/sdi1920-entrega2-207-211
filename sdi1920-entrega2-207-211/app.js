@@ -61,6 +61,8 @@ routerUsuarioToken.use(function (req, res, next) {
     }
 });
 app.use("/api/friendships", routerUsuarioToken);
+app.use("/api/message", routerUsuarioToken);
+app.use("/api/conversation", routerUsuarioToken);
 
 //BodyParser
 app.use(bodyParser.json());
@@ -77,11 +79,6 @@ app.set('key', 'abcdefg');
 app.set('crypto', crypto);
 
 
-//Routers
-require('./routes/rinvitations')(app, swig, gestorBD);
-require('./routes/rfriendships')(app, swig, gestorBD);
-require('./routes/rapimessages')(app, gestorBD);
-require("./routes/users.js")(app, swig, gestorBD);
 
 // routerUserSession
 {
@@ -99,6 +96,13 @@ require("./routes/users.js")(app, swig, gestorBD);
     app.use('/invitation', routerUserSession);
     app.use('/friendships', routerUserSession);
 }
+
+//Routers
+require('./routes/rinvitations')(app, swig, gestorBD);
+require('./routes/rfriendships')(app, swig, gestorBD);
+require('./routes/rapimessages')(app, gestorBD);
+require("./routes/users.js")(app, swig, gestorBD);
+
 
 
 //default -> index
