@@ -1,0 +1,77 @@
+<div id="widget-friendships">
+
+    <input type="text" class="form-control" placeholder="Buscar por nombre"
+           id="name-filter"/>
+    <button class="btn" onclick="loadFriendships()">Actualizar</button>
+
+    <table class="table table-hover">
+        <thead>
+        <tr>
+            <th>Nombre</th>
+            <th>Apellido</th>
+            <th>Email</th>
+            <th class="col-md-1"></th>
+        </tr>
+        </thead>
+        <tbody id="tablaCuerpo">
+        </tbody>
+    </table>
+</div>
+
+<script>
+    window.history.pushState("", "", "/cliente.html?w=friendships");
+
+    var friendships;
+
+    function loadFriendships() {
+        $.ajax({
+            url: URLbase + "/friendships",
+            type: "GET",
+            data: {},
+            dataType: 'json',
+            headers: {"token": token},
+
+            success: function (respuesta) {
+                friendships = respuesta;
+                actualizarTabla(friendships);
+            },
+            error: function (error) {
+                $("#contenedor-principal").load("widget-login.html");
+            }
+        });
+    }
+
+    function actualizarTabla(amigosMostrar) {
+        $("#tablaCuerpo").empty(); // Vaciar la tabla
+
+        let friendships = JSON.parse(amigosMostrar);
+
+        for (i = 0; i < friendships.length; i++) {
+            $("#tablaCuerpo")
+                .append("<tr id=" + friendships[i]._id + ">" +
+                    "<td>" + friendships[i].name + "</td>" +
+                    "<td>" + friendships[i].surname + "</td>" +
+                    "<td>" + friendships[i].email + "</td>" +
+                    +"</tr>"
+                );
+        }
+    }
+
+    loadFriendships();
+
+    $('#name-filter').on('input',function(e){
+        var friendsResult = [];
+        var filter = $("#name-filter").val();
+
+        let jsonFormat = JSON.parse(friendships);
+        for (i = 0; i < jsonFormat.length; i++) {
+
+            if (jsonFormat[i].name.indexOf(filter) != -1 ){
+                friendsResult.push(jsonFormat[i]);
+            }
+        }
+        actualizarTabla(JSON.stringify(friendsResult));
+    });
+
+
+</script>

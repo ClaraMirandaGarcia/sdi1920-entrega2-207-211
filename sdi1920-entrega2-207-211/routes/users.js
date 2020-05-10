@@ -1,4 +1,9 @@
 module.exports = function (app, swig, gestorBD) {
+  app.get("/logout", function (req, res) {
+    req.session.usuario = null;
+    res.redirect("/login?Desconectado con exito");
+  });
+
   app.get("/users", function (req, res) {
     let criterio = {};
 
@@ -42,6 +47,7 @@ module.exports = function (app, swig, gestorBD) {
           users: users,
           paginas: paginas,
           actual: pg,
+          loggedIn: !!req.session.usuario,
         });
         res.send(respuesta);
       }
@@ -49,12 +55,12 @@ module.exports = function (app, swig, gestorBD) {
   });
 
   app.get("/signup", function (req, res) {
-    let response = swig.renderFile("views/bsignup.html", {});
+    let response = swig.renderFile("views/bsignup.html", {loggedIn: !!req.session.usuario,});
     res.send(response);
   });
 
   app.get("/login", function (req, res) {
-    let respuesta = swig.renderFile("views/blogin.html", {});
+    let respuesta = swig.renderFile("views/blogin.html", {loggedIn: !!req.session.usuario,});
     res.send(respuesta);
   });
 
@@ -77,7 +83,7 @@ module.exports = function (app, swig, gestorBD) {
             "&messageType=alert-danger "
         );
       } else {
-        req.session.usuario = users[0].email;
+        req.session.usuario = users[0];
         res.redirect("/users");
       }
     });

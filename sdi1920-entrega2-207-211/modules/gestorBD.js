@@ -1,7 +1,7 @@
 module.exports = {
     mongo: null,
     app: null,
-    init: function (app,mongo) {
+    init: function (app, mongo) {
         this.mongo = mongo;
         this.app = app;
     },
@@ -10,14 +10,14 @@ module.exports = {
     obtainUsersPg: function (criterio, pg, funcionCallback) {
         this.mongo.MongoClient.connect(this.app.get('db'), function (err, db) {
             if (err) {
-               funcionCallback(null);
+                funcionCallback(null);
             } else {
                 let collection = db.collection('users');
                 let totalResults = collection.find(criterio);
 
-                totalResults.count(function(err, count){
-                    totalResults.skip( (pg-1)*5 ).limit( 5 )
-                        .toArray(function(err, usuarios) {
+                totalResults.count(function (err, count) {
+                    totalResults.skip((pg - 1) * 5).limit(5)
+                        .toArray(function (err, usuarios) {
                             if (err) {
                                 funcionCallback(null);
                                 console.log(err);
@@ -85,15 +85,15 @@ module.exports = {
         });
     },
 
-    obtainInvitationsPg : function(criterio, pg, funcionCallback){
-        this.mongo.MongoClient.connect(this.app.get('db'), function(err, db) {
+    obtainInvitationsPg: function (criterio, pg, funcionCallback) {
+        this.mongo.MongoClient.connect(this.app.get('db'), function (err, db) {
             if (err) {
                 funcionCallback(null);
             } else {
                 let collection = db.collection('invitations');
-                collection.count(function(err, count){
-                    collection.find(criterio).skip( (pg-1)*4 ).limit( 4 )
-                        .toArray(function(err, invitations) {
+                collection.count(function (err, count) {
+                    collection.find(criterio).skip((pg - 1) * 4).limit(4)
+                        .toArray(function (err, invitations) {
                             if (err) {
                                 funcionCallback(null);
                             } else {
@@ -143,15 +143,15 @@ module.exports = {
         });
     },
 
-    obtainFriendshipsPg : function(criterio, pg, funcionCallback){
-        this.mongo.MongoClient.connect(this.app.get('db'), function(err, db) {
+    obtainFriendshipsPg: function (criterio, pg, funcionCallback) {
+        this.mongo.MongoClient.connect(this.app.get('db'), function (err, db) {
             if (err) {
                 funcionCallback(null);
             } else {
                 let collection = db.collection('friendship');
-                collection.count(function(err, count){
-                    collection.find(criterio).skip( (pg-1)*4 ).limit( 4 )
-                        .toArray(function(err, friendship) {
+                collection.count(function (err, count) {
+                    collection.find(criterio).skip((pg - 1) * 4).limit(4)
+                        .toArray(function (err, friendship) {
                             if (err) {
                                 funcionCallback(null);
                             } else {
@@ -162,5 +162,44 @@ module.exports = {
                 });
             }
         });
-    }
+    },
+
+    obtainFriendships: function (criterio,  funcionCallback) {
+        this.mongo.MongoClient.connect(this.app.get('db'), function (err, db) {
+            if (err) {
+                funcionCallback(null);
+            } else {
+                let collection = db.collection('friendship');
+                collection.find(criterio).toArray(function (err, friendships) {
+                    if (err) {
+                        funcionCallback(null);
+                    } else {
+                        funcionCallback(friendships);
+                    }
+                    db.close();
+                });
+            }
+        });
+    },
+
+
+    //messages
+    insertMessage: function (message, funcionCallback) {
+        this.mongo.MongoClient.connect(this.app.get('db'), function (err, db) {
+            if (err) {
+                funcionCallback(null);
+            } else {
+                let collection = db.collection('messages');
+                collection.insert(message, function (err, result) {
+                    if (err) {
+                        funcionCallback(null);
+                    } else {
+                        funcionCallback(result.ops[0]._id);
+                    }
+                    db.close();
+                });
+            }
+        });
+    },
+
 };
