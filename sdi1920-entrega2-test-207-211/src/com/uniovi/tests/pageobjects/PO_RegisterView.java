@@ -45,14 +45,12 @@ public class PO_RegisterView extends PO_NavView {
 			String passwordconfp) {
 		PO_HomeView.clickOption(driver, "signup", "class", "btn btn-primary");
 		PO_RegisterView.fillForm(driver, emailp, namep, lastnamep, passwordp, passwordconfp);
-		PO_View.checkElement(driver, "text", emailp);
-		PO_PrivateView.clickOption(driver, "logout", "id", "loginButton");
+		PO_View.checkElement(driver, "text", "Nuevo usuario registrado");
 	}
 
 	private static boolean checkUser(WebDriver driver, String texto) {
 		PO_HomeView.loginForm(driver, "class", "btn btn-primary", "login", "prueba1@prueba1.com", "123");
-		PO_PrivateView.clickMenuOption(driver, "free", "//li[contains(@id, 'users-menu')]/a", "free",
-				"//a[contains(@href,'user/list')]");
+		int pagenumber = 2;
 		do {
 			try {
 				SeleniumUtils.EsperaCargaPagina(driver, "text", texto, PO_View.getTimeout());
@@ -60,9 +58,10 @@ public class PO_RegisterView extends PO_NavView {
 			} catch (TimeoutException e) {
 			}
 			try {
-				List<WebElement> elementos = PO_View.checkElement(driver, "id", "page-item-next");
+				List<WebElement> elementos = PO_View.checkElement(driver, "id", "pi-"+pagenumber);
 				assertTrue(elementos.size() == 1);
-				elementos.get(0).click();
+				elementos.get(0).findElement(By.className("page-link")).click();
+				pagenumber++;
 			} catch (TimeoutException e) {
 				PO_PrivateView.clickOption(driver, "logout", "id", "loginButton");
 				return false;

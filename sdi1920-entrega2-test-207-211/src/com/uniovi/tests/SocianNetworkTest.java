@@ -86,7 +86,7 @@ public class SocianNetworkTest {
 	@Test
 	public void PR03() {
 		PO_HomeView.clickOption(driver, "signup", "class", "btn btn-primary");
-		PO_RegisterView.fillForm(driver, "newEmail03@whatever.xd", "bestname03", "suchlastname03", "", "");
+		PO_RegisterView.fillForm(driver, "newEmail03@whatever.xd", "bestname03", "suchlastname03", "0", "0");
 		PO_RegisterView.checkKey(driver, "Error.signup.password.length", PO_Properties.getSPANISH());
 		PO_RegisterView.checkUserDoesNotExist(driver, "newEmail03@whatever.xd");
 	}
@@ -94,7 +94,7 @@ public class SocianNetworkTest {
 	// Registro de Usuario con datos inválidos (email existente).
 	@Test
 	public void PR04() {
-		PO_RegisterView.checkUserExist(driver, "fakemail@notAdomain.xd");
+		PO_RegisterView.checkUserExist(driver, "newEmail@whatever.xd");
 		PO_HomeView.clickOption(driver, "signup", "class", "btn btn-primary");
 		// email vacio
 		PO_RegisterView.fillForm(driver, "newEmail@whatever.xd", "emailcreated", "in", "pr01", "pr01");
@@ -153,7 +153,7 @@ public class SocianNetworkTest {
 		// de sesión.
 		PO_HomeView.clickOption(driver, "logout", "class", "btn btn-primary");
 
-		PO_View.checkElement(driver, "text", "Identificate");
+		PO_View.checkElement(driver, "text", "Identifícate");
 	}
 
 	// PR10. Comprobar que el botón cerrar sesión no está visible si el usuario no está autenticado.
@@ -167,7 +167,7 @@ public class SocianNetworkTest {
 
 		PO_HomeView.clickOption(driver, "logout", "class", "btn btn-primary");
 
-		PO_View.checkElement(driver, "text", "Identificate");
+		PO_View.checkElement(driver, "text", "Identifícate");
 		SeleniumUtils.textoNoPresentePagina(driver, "Desconectar");
 	}
 
