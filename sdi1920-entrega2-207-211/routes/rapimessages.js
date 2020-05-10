@@ -10,13 +10,51 @@ module.exports = function (app, gestorBD) {
                 destino: req.body.u1
             }]
         };
-        gestorBD.obtainConversation(users, function (messages) {
+        gestorBD.obtainMessage(users, function (messages) {
             if (messages == null) {
                 res.status(500);
                 res.json({error: "conversación no encontrada"})
             } else {
                 res.status(200);
                 res.send(JSON.stringify(messages))
+            }
+        })
+    });
+
+    function checkReceptor(criterio, usuario, callback) {
+        gestorBD.obtainMessage(criterio, function (messages) {
+            console.log(messages[0].destino)
+            console.log(usuario)
+            if (usuario && messages[0].destino === usuario) {
+                callback(null)
+            } else {
+                callback("No tiene permisos para acceder a ese mensaje")
+            }
+        })
+    }
+    app.put("/api/message/markRead/:id", function (req, res ) {
+        let criterio = {"_id": gestorBD.mongo.ObjectID(req.params.id)};
+        checkReceptor(criterio,res.usuario, function (errorMessage) {
+            if (errorMessage == null){
+                gestorBD.markRead(criterio,function (result) {
+                    if (result == null) {
+                        res.status(500);
+                        res.json({
+                            error: "se ha producido un error"
+                        })
+                    } else {
+                        res.status(200);
+                        res.json({
+                            mensaje: "mensaje marcado como leido",
+                            _id: req.params.id
+                        })
+                    }
+                })
+            }else {
+                res.status(500);
+                res.json({
+                    error: errorMessage
+                })
             }
         })
     });

@@ -61,6 +61,8 @@ routerUsuarioToken.use(function (req, res, next) {
     }
 });
 app.use("/api/friendships", routerUsuarioToken);
+app.use("/api/message", routerUsuarioToken);
+app.use("/api/conversation", routerUsuarioToken);
 
 //BodyParser
 app.use(bodyParser.json());
