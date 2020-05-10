@@ -52,6 +52,7 @@ module.exports = function (app, swig, gestorBD) {
     //invitaciones para x
     app.get("/invitations", function (req, res) {
 
+        console.log(req.session.usuario);
             let criterio = {
                 userTo: gestorBD.mongo.ObjectID(req.session.usuario._id.toString())
             };
@@ -63,8 +64,9 @@ module.exports = function (app, swig, gestorBD) {
 
 
             gestorBD.obtainInvitationsPg(criterio, pg, function (invitations, total) {
-                if (invitations == null) {
+                if (invitations == null ) {
                     //manejo error
+
                     res.send("Error al listar ");
                 } else {
 
@@ -76,10 +78,11 @@ module.exports = function (app, swig, gestorBD) {
                     }
 
                     gestorBD.getUsers(criterio, function (users) {
-                        if (users == null || users.length == 0) {
+                        if (users == null ) {
+                            console.log('AAAAAAAAA');
                             //redirect?
                         } else {
-                            if (invitations.length != 0) {
+                            //if (invitations.length = 0) {
                                 let ultimaPg = total / 5;
                                 if (total % 5 > 0) { // Sobran decimales
                                     ultimaPg = ultimaPg + 1;
@@ -98,9 +101,9 @@ module.exports = function (app, swig, gestorBD) {
                                 });
                                 res.send(respuesta);
 
-                            } else {
-                                console.log('Este usuario no tiene invitaciones de amistad');
-                            }
+                            //} else {
+                            //    console.log('Este usuario no tiene invitaciones de amistad');
+                            //}
 
                         }
                     });

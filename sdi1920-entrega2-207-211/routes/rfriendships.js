@@ -1,7 +1,7 @@
 module.exports = function (app, swig, gestorBD) {
 
 
-    //invitaciones para x
+    //amigos de x
     app.get("/friendships", function (req, res) {
 
             let userSession = gestorBD.mongo.ObjectID(req.session.usuario._id.toString());
@@ -34,7 +34,6 @@ module.exports = function (app, swig, gestorBD) {
                             return {_id: gestorBD.mongo.ObjectID(f.userFrom.toString())}
                         })
                     }
-
                     gestorBD.getUsers(criterio, function (users) {
 
                         if (users == null || users.length == 0) {
