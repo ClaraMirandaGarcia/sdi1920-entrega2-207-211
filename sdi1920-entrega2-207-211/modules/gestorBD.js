@@ -92,7 +92,7 @@ module.exports = {
             } else {
                 let collection = db.collection('invitations');
                 collection.count(function (err, count) {
-                    collection.find(criterio).skip((pg - 1) * 4).limit(4)
+                    collection.find(criterio).skip((pg - 1) * 5).limit(5)
                         .toArray(function (err, invitations) {
                             if (err) {
                                 funcionCallback(null);
@@ -101,6 +101,24 @@ module.exports = {
                             }
                             db.close();
                         });
+                });
+            }
+        });
+    },
+
+    obtainInvitations: function (criterio, funcionCallback) {
+        this.mongo.MongoClient.connect(this.app.get('db'), function (err, db) {
+            if (err) {
+                funcionCallback(null);
+            } else {
+                let collection = db.collection('invitations');
+                collection.find(criterio).toArray(function (err, invitations) {
+                    if (err) {
+                        funcionCallback(null);
+                    } else {
+                        funcionCallback(invitations);
+                    }
+                    db.close();
                 });
             }
         });
@@ -150,7 +168,7 @@ module.exports = {
             } else {
                 let collection = db.collection('friendship');
                 collection.count(function (err, count) {
-                    collection.find(criterio).skip((pg - 1) * 4).limit(4)
+                    collection.find(criterio).skip((pg - 1) * 5).limit(5)
                         .toArray(function (err, friendship) {
                             if (err) {
                                 funcionCallback(null);
@@ -164,7 +182,7 @@ module.exports = {
         });
     },
 
-    obtainFriendships: function (criterio,  funcionCallback) {
+    obtainFriendships: function (criterio, funcionCallback) {
         this.mongo.MongoClient.connect(this.app.get('db'), function (err, db) {
             if (err) {
                 funcionCallback(null);

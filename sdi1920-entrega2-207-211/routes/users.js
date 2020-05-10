@@ -30,7 +30,9 @@ module.exports = function (app, swig, gestorBD) {
 
     gestorBD.obtainUsersPg(criterio, pg, function (users, total) {
       if (users == null) {
-        res.send("Error al listar ");
+        //ERROR MANAGEMENT
+        req.session.usuario = null;
+        res.send("Error al listar");
       } else {
         let ultimaPg = total / 5;
         if (total % 5 > 0) {

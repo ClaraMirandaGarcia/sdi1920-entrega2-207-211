@@ -7,6 +7,8 @@
     <!-- http://librosweb.es/libro/bootstrap_3/capitulo_2/tipos_de_rejillas.html -->
     <!-- Inicio del Bloque canción -->
 
+
+    {% if users.length %}
     <table class="table table-hover" id="tableUsers">
         <thead>
         <tr>
@@ -16,6 +18,8 @@
             <th class="col-md-1"></th>
         </tr>
         </thead>
+
+
 
         <tbody>
         {% for user in users %}
@@ -30,7 +34,10 @@
         {% endfor %}
         </tbody>
     </table>
-    <!-- Fin del Bloque usuarios -->
+    {% else %}
+    <p>No tienes ninguna petición de amistadr</p>
+    {% endif %}
+
 </div>
 
 <!-- Paginación mostrar la actual y 2 anteriores y dos siguientes -->

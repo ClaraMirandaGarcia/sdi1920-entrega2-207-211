@@ -7,6 +7,7 @@
     <!-- http://librosweb.es/libro/bootstrap_3/capitulo_2/tipos_de_rejillas.html -->
     <!-- Inicio del Bloque canción -->
 
+    {% if users.length %}
     <table class="table table-hover" id="tableUsers">
         <thead>
         <tr>
@@ -30,6 +31,11 @@
         {% endfor %}
         </tbody>
     </table>
+    {% else %}
+    <p>Todavía no tienes ningún amigo</p>
+    {% endif %}
+
+
     <!-- Fin del Bloque usuarios -->
 </div>
 
