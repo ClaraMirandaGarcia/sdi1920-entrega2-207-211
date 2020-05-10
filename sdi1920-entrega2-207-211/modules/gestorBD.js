@@ -202,21 +202,43 @@ module.exports = {
         });
     },
 
-    obtainConversation: function (criterio, funcionCallback) {
+    markRead: function (criterio, funcionCallback) {
+        let mensaje={};
+        mensaje.leido = true;
         this.mongo.MongoClient.connect(this.app.get('db'), function (err, db) {
             if (err) {
                 funcionCallback(null);
             } else {
                 let collection = db.collection('messages');
-                collection.find(criterio).toArray(function (err, messages) {
+                collection.update(criterio, {$set: mensaje}, function (err, result) {
                     if (err) {
                         funcionCallback(null);
                     } else {
-                        funcionCallback(messages);
+                        funcionCallback(result);
                     }
                     db.close();
                 });
             }
         });
+    },
+
+    obtainMessage: function (criterio, funcionCallback) {
+        this.mongo.MongoClient.connect(this.app.get('db'), function (err, db) {
+            if (err) {
+                funcionCallback(null);
+            } else {
+                let collection = db.collection('messages');
+                collection.find(criterio).toArray(function (err, canciones) {
+                    if (err) {
+                        funcionCallback(null);
+                    } else {
+                        funcionCallback(canciones);
+                    }
+                    db.close();
+                });
+            }
+        });
+
     }
+
 };
