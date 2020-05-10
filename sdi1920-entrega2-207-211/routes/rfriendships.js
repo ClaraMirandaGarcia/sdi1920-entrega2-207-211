@@ -43,8 +43,8 @@ module.exports = function (app, swig, gestorBD) {
                                 //TODO
                                 //ERROR
                                 res.redirect("/usuarios" +
-                                    "?mensaje=Error interno" +
-                                    "&tipoMensaje=alert-warning ");
+                                    "?message=Error interno" +
+                                    "&messageType=alert-warning ");
                             } else {
                                 //tenemos todos los usuarios que forman parte de la relación de friendhips
                                 //tenemos que filtrarlos, quitar los usuarios que seamos nosotros mismos.

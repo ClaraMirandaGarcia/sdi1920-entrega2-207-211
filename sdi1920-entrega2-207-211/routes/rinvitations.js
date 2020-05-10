@@ -20,7 +20,7 @@ module.exports = function (app, swig, gestorBD) {
                     //ERROR MANAGEMENT, the user does not exist
                     res.redirect("/users" +
                         "?mensaje=Usuario no existe" +
-                        "&tipoMensaje=alert-danger ");
+                        "&messageType=alert-danger ");
 
                 } else {
                     //THE USERS EXIST
@@ -44,7 +44,7 @@ module.exports = function (app, swig, gestorBD) {
                         if (invitations != null && invitations.length > 0) {
                             res.redirect("/users" +
                                 "?mensaje=Ya existe una invitación" +
-                                "&tipoMensaje=alert-danger ");
+                                "&messageType=alert-danger ");
 
                         } else {
                             // NO INVITATIONS ALREADY SENT
@@ -52,8 +52,8 @@ module.exports = function (app, swig, gestorBD) {
                             //check if it's the same user
                             if (user_from.email == user_to.email) {
                                 res.redirect("/users" +
-                                    "?mensaje=No te pusedes enviar invitaciones" +
-                                    "&tipoMensaje=alert-danger ");
+                                    "?message=No te puedes enviar invitaciones" +
+                                    "&messageType=alert-danger ");
 
                             } else {
 
@@ -61,8 +61,8 @@ module.exports = function (app, swig, gestorBD) {
                                 gestorBD.obtainFriendships(criterioInvitation, function (friendships, total) {
                                     if (friendships != null && friendships.length > 0) {
                                         res.redirect("/users" +
-                                            "?mensaje=Ya sois amigos" +
-                                            "&tipoMensaje=alert-danger ");
+                                            "?message=¡Ya es tu amigo!" +
+                                            "&messageType=alert-danger ");
                                     } else {
 
                                         // NO FRIENDS ALREADY
@@ -72,12 +72,12 @@ module.exports = function (app, swig, gestorBD) {
                                                 //ERROR MANAGEMENT
                                                 //TODO
                                                 res.redirect("/users" +
-                                                    "?mensaje=Hubo un error" +
-                                                    "&tipoMensaje=alert-danger ");
+                                                    "?message=Hubo un error" +
+                                                    "&messageType=alert-danger ");
                                             } else {
                                                 res.redirect("/users" +
-                                                    "?mensaje=Se envió correctamente" +
-                                                    "&tipoMensaje=alert-success ");
+                                                    "?message=Se envió correctamente" +
+                                                    "&messageType=alert-success ");
                                             }
                                         })
                                     }
@@ -109,7 +109,7 @@ module.exports = function (app, swig, gestorBD) {
                     //TODO error
                     res.redirect("/users" +
                         "?mensaje=No hay ninguna invitación"+
-                        "&tipoMensaje=alert-warning ");
+                        "&messageType=alert-warning ");
                 } else {
 
 
@@ -195,7 +195,7 @@ module.exports = function (app, swig, gestorBD) {
                             //redirect to list of friends.
                             res.redirect("/users" +
                                 "?mensaje=Se ha añadido a un amigo"+
-                                "&tipoMensaje=alert-success ");
+                                "&messageType=alert-success ");
                         }
                     })
                 }
