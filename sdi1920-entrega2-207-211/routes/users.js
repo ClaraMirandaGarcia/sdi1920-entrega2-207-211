@@ -92,6 +92,14 @@ module.exports = function (app, swig, gestorBD) {
   });
 
   app.post("/user", function (req, res) {
+    if (req.body.password.length <3){
+      res.redirect(
+          "/signup?message=Las contraseña debe tener al menos 3 caracteres." +
+          "&messageType=alert-danger"
+      );
+      return;
+    }
+     
     let hash = app
       .get("crypto")
       .createHmac("sha256", app.get("key"))
