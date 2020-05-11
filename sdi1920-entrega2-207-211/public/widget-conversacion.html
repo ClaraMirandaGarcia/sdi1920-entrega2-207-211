@@ -70,6 +70,37 @@
     }
     function newMessage() {
 
+        // get all data
+        let destino = emailObjetivo;
+        let texto = $("#newMessage").val();
+
+        if(texto === ""){
+            return ;
+        } else{
+            $.ajax({
+
+                url: URLbase + "/message/send",
+                type: "POST",
+                data: {
+                    destino: destino,
+                    texto: texto,
+                },
+                dataType: 'json',
+                headers: {"token": token},
+                success: function (respuesta) {
+                    //show chat?
+                    getConversacion();
+                },
+                error: function (error) {
+                    $("#contenedor-principal").load("widget-login.html");
+                }
+            });
+
+            $("#textArea-mensaje").val("");
+        }
+
+
+
     }
     var x = setInterval(getConversacion ,1000);
 </script>
