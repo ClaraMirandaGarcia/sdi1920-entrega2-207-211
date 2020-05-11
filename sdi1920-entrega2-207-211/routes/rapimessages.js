@@ -160,7 +160,6 @@ module.exports = function (app, gestorBD) {
                 let userSessionId = userSessionCompl._id.toString();
                 let userSession = gestorBD.mongo.ObjectID(userSessionCompl._id.toString());
 
-
                 let criterioFrom = {
                     userFrom: userSession
                 }
@@ -182,7 +181,6 @@ module.exports = function (app, gestorBD) {
 
                         if (friendships.length == 0) {
                             let users = [];
-
                             res.status(200);
                             res.json(JSON.stringify(users));
 
