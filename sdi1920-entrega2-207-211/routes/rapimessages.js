@@ -22,12 +22,19 @@ module.exports = function (app, gestorBD) {
         //criteria
     });
     app.post("/api/conversation", function (req, res) {
+        let user2;
+        if (req.body.u2){
+            user2 = req.body.u2;
+        }else{
+            user2 = res.usuario;
+        }
+
         let users = {
             $or: [{
                 emisor: req.body.u1,
-                destino: res.usuario
+                destino: user2
             }, {
-                emisor: res.usuario,
+                emisor: user2,
                 destino: req.body.u1
             }]
         };
