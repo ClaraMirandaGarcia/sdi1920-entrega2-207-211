@@ -12,6 +12,7 @@
             <th>Nombre</th>
             <th>Apellido</th>
             <th>Email</th>
+            <th>Sin leer</th>
             <th class="col-md-1"></th>
         </tr>
         </thead>
@@ -26,6 +27,7 @@
     window.history.pushState("", "", "/cliente.html?w=friendships");
 
     var friendships;
+    var frUnreadMessages;
 
     function loadFriendships() {
         $.ajax({
@@ -36,8 +38,10 @@
             headers: {"token": token},
 
             success: function (respuesta) {
-                friendships = respuesta;
-                actualizarTabla(friendships);
+                friendships = JSON.parse(respuesta);
+                unreadMessages();
+                //actualizarTabla(friendships);
+
             },
             error: function (error) {
                 console.log(error);
@@ -46,17 +50,49 @@
         });
     }
 
-    function actualizarTabla(amigosMostrar) {
+    function unreadMessages() {
+        frUnreadMessages = [];
+        //iterate
+        for (let i = 0; i < friendships.length; i++) {
+            console.log('AAAAAAAA')
+            console.log(friendships[i]);
+            $.ajax({
+                url: URLbase + "/message/unread",
+                type: "POST",
+                data: {
+                    friend: friendships[i]
+                },
+                dataType: 'json',
+                headers: {"token": token},
+
+                success: function (respuesta) {
+                    frUnreadMessages.push(JSON.parse(respuesta));
+                    actualizarTabla(frUnreadMessages);
+                },
+                error: function (error) {
+                    console.log(error);
+                    $("#contenedor-principal").load("widget-login.html");
+                }
+            });
+        }
+
+    }
+
+    function actualizarTabla(friendships) {
         $("#tablaCuerpo").empty(); // Vaciar la tabla
 
-        let friendships = JSON.parse(amigosMostrar);
+        //let friendships = JSON.parse(amigosMostrar);
+        let numMessages;
 
         for (i = 0; i < friendships.length; i++) {
+
+            numMessages = friendships[i].numNonReadMessages || "0";
             $("#tablaCuerpo")
-                .append("<tr onclick=conversacion('" + friendships[i].email + "') id=" + friendships[i]._id + ">"+
+                .append("<tr onclick=conversacion('" + friendships[i].email + "') id=" + friendships[i]._id + ">" +
                     "<td class='friendData'>" + friendships[i].name + "</td>" +
                     "<td class='friendData'>" + friendships[i].surname + "</td>" +
                     "<td class='friendData'>" + friendships[i].email + "</td>" +
+                    "<td class='friendData'>" + friendships[i].numNonReadMessages + "</td>" +
                     +"</tr>"
                 );
         }
@@ -64,14 +100,14 @@
 
     loadFriendships();
 
-    $('#name-filter').on('input',function(e){
+    $('#name-filter').on('input', function (e) {
         var friendsResult = [];
         var filter = $("#name-filter").val();
 
         let jsonFormat = JSON.parse(friendships);
         for (i = 0; i < jsonFormat.length; i++) {
 
-            if (jsonFormat[i].name.indexOf(filter) != -1 ){
+            if (jsonFormat[i].name.indexOf(filter) != -1) {
                 friendsResult.push(jsonFormat[i]);
             }
         }

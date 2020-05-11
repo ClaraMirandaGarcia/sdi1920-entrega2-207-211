@@ -1,5 +1,29 @@
 module.exports = function (app, gestorBD) {
 
+    ///message/unread"
+    app.post("/api/message/unread", function (req, res) {
+        //get friend
+        let friend = req.body.friend;
+
+        //criteria
+        let criteria = {
+            emisor: friend.email,
+            destino: res.usuario,
+            leido: false
+        }
+        console.log(criteria);
+        console.log(friend);
+
+        gestorBD.obtainNonreadMessages(criteria, function(messagesNum){
+            //return a friend
+
+            res.status(200);
+            friend.numNonReadMessages = messagesNum;
+            res.json(JSON.stringify(friend));
+            console.log(friend);
+        });
+        //criteria
+    });
     app.post("/api/conversation", function (req, res) {
         let users = {
             $or: [{
