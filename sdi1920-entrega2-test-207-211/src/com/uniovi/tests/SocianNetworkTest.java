@@ -19,6 +19,7 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.firefox.FirefoxDriver;
 
+import com.uniovi.tests.pageobjects.PO_ChatView;
 //Paquetes con los Page Object
 import com.uniovi.tests.pageobjects.PO_HomeView;
 import com.uniovi.tests.pageobjects.PO_LoginView;
@@ -489,14 +490,7 @@ public class SocianNetworkTest {
 		
 		//crear && enviar mensaje
 		String mensaje = "MensajeTest28";
-		WebElement search = driver.findElement(By.id("newMessage"));
-		search.click();
-		search.clear();
-		search.sendKeys(mensaje);
-		
-		WebElement sendButton = driver.findElement(By.id("addMessage"));
-		sendButton.click();
-		PO_View.checkElement(driver, "text", mensaje);	
+		PO_ChatView.createSendMessage(mensaje, driver);	
 		
 	}
 
@@ -542,7 +536,32 @@ public class SocianNetworkTest {
 	
 	@Test
 	public void PR30() {
-		assertTrue("PR30 sin hacer", false);
+		//asdf no tiene más amigos
+		PO_HomeView.loginApiForm(driver, "tengo3amigos@gmail.com", "tengo3amigos");
+		
+		//id -> asdf = 5eb58d1df805e44eda6da88d
+		List<WebElement> row = PO_View.checkElement(driver, "id", "5eb58d1df805e44eda6da88d");
+		row.get(0).findElement(By.className("friendData")).click();
+		
+		//crear && enviar mensaje
+		String mensaje01 = "MensajeTest30_01";
+		PO_ChatView.createSendMessage(mensaje01, driver);	
+		String mensaje02 = "MensajeTest30_02";
+		PO_ChatView.createSendMessage(mensaje02, driver);	
+		String mensaje03 = "MensajeTest30_03";
+		PO_ChatView.createSendMessage(mensaje03, driver);	
+		
+		//Botón volver
+		WebElement returnButton = driver.findElement(By.id("volverApp"));
+		returnButton.click();
+		//Iniciar sesión
+		PO_HomeView.loginApiForm(driver, "asdf@gmail.com", "asdf");
+		//chat -> tengo3amigos@gmail.com. 5eb92576209b0415355b6270
+		
+		
+		//check 3 unread messages en la lista de amigos
+		PO_View.checkElement(driver, "text", "3");
+		
 	}
 
 	// PR031. Identificarse con un usuario A que al menos tenga 3 amigos, ir al chat
