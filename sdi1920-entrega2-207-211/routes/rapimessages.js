@@ -61,7 +61,6 @@ module.exports = function (app, gestorBD) {
 
 
     app.post("/api/message/send", function (req, res) {
-
         let criterioEmisor = {
             email: res.usuario
         }
@@ -82,7 +81,6 @@ module.exports = function (app, gestorBD) {
                     error: "Error al obtener los usuarios del mensaje "
                 });
             } else {
-
                 //both users were found
 
                 //create the message
@@ -96,6 +94,18 @@ module.exports = function (app, gestorBD) {
                 //insert the message
                 gestorBD.insertMessage(message, (id) => {
                     if (id) {
+                        let criterio = {
+                            $or: [{
+                                userFrom: gestorBD.mongo.ObjectID(users[0]._id),
+                                userTo: gestorBD.mongo.ObjectID(users[1]._id)
+                            }, {
+                                userFrom: gestorBD.mongo.ObjectID(users[1]._id),
+                                userTo: gestorBD.mongo.ObjectID(users[0]._id)
+                            }]
+                        };
+                        gestorBD.updateDate(criterio, function (result) {
+
+                        });
                         res.status(200);
                         res.json({
                             mensaje: "Enviado correctamente",
