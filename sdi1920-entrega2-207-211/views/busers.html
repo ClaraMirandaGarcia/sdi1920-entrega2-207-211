@@ -14,7 +14,7 @@
                 <input type="text" class="search-query form-control"
                        placeholder="Nombre, apellidos o email del usuario" name="busqueda"/>
                 <span class="input-group-btn">
-					<button class="btn" type="submit">
+					<button id="submitUserSearch" class="btn" type="submit">
 						<span class="glyphicon glyphicon-search"></span>
 					</button>
 				</span>
@@ -45,7 +45,7 @@
             <td>{{user.surname}}</td>
             <td>{{user.email}}</td>
             <!-- Friendship invitation -->
-            <td><a href="/invitation/send/{{user._id.toString()}}">Agregar amigo</a></td>
+            <td ><a href="/invitation/send/{{user._id.toString()}}">Agregar amigo</a></td>
 
         </tr>
         {% endfor %}

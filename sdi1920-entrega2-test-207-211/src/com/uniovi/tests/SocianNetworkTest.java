@@ -1,27 +1,41 @@
 package com.uniovi.tests;
 
-//Paquetes Java
-import java.util.List;
-//Paquetes JUnit 
-import org.junit.*;
-import org.junit.runners.MethodSorters;
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+
+import java.util.List;
+
+//Paquetes JUnit 
+import org.junit.After;
+import org.junit.AfterClass;
+import org.junit.Before;
+import org.junit.BeforeClass;
+import org.junit.FixMethodOrder;
+import org.junit.Test;
+import org.junit.runners.MethodSorters;
 //Paquetes Selenium 
-import org.openqa.selenium.*;
-import org.openqa.selenium.firefox.*;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
+import org.openqa.selenium.firefox.FirefoxDriver;
+
+//Paquetes con los Page Object
+import com.uniovi.tests.pageobjects.PO_HomeView;
+import com.uniovi.tests.pageobjects.PO_LoginView;
+import com.uniovi.tests.pageobjects.PO_PrivateView;
+import com.uniovi.tests.pageobjects.PO_Properties;
+import com.uniovi.tests.pageobjects.PO_RegisterView;
+import com.uniovi.tests.pageobjects.PO_View;
 //Paquetes Utilidades de Testing Propias
 import com.uniovi.tests.util.SeleniumUtils;
-//Paquetes con los Page Object
-import com.uniovi.tests.pageobjects.*;
 
 //Ordenamos las pruebas por el nombre del método
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class SocianNetworkTest {
 
 	static String PathFirefox65 = "C:\\Program Files\\Mozilla Firefox\\firefox.exe";
+	static String Geckdriver024 = "C:\\Users\\CMG\\Desktop\\Tercero\\2_Cuatrimestre\\SDI\\Laboratorio\\Material\\PL-SDI-Sesión5-material\\PL-SDI-Sesión5-material\\geckodriver024win64.exe";
 	// static String Geckdriver024 =
-	// "C:\\Users\\CMG\\Desktop\\Tercero\\2_Cuatrimestre\\SDI\\Laboratorio\\Material\\PL-SDI-Sesión5-material\\PL-SDI-Sesión5-material\\geckodriver024win64.exe";
-	static String Geckdriver024 = "C:\\Users\\AGM-PC\\Documents\\GitHub\\SDI\\PL-SDI-Sesión5-material\\geckodriver024win64.exe";
+	// "C:\\Users\\AGM-PC\\Documents\\GitHub\\SDI\\PL-SDI-Sesión5-material\\geckodriver024win64.exe";
 	static WebDriver driver = getDriver(PathFirefox65, Geckdriver024);
 	static String URL = "https://localhost:8081";
 
@@ -169,60 +183,203 @@ public class SocianNetworkTest {
 
 		PO_View.checkElement(driver, "text", "Identifícate");
 		SeleniumUtils.textoNoPresentePagina(driver, "Desconectar");
+		
 	}
 
 	// PR11. Sin hacer /
 	@Test
 	public void PR11() {
-		assertTrue("PR11 sin hacer", false);
+		PO_HomeView.loginForm(driver, "class", "btn btn-primary", "login", "prueba1@prueba1.com", "123");
+		PO_View.checkElement(driver, "id", "tableUsers");
+
+		assertEquals(4, PO_PrivateView.countInPagination(driver, tableUsers));
+
+		// logout
+		PO_HomeView.clickOption(driver, "logout", "class", "btn btn-primary");
+
 	}
 
-	// PR12. Sin hacer /
+	// [Prueba12] Hacer una búsqueda con el campo vacío y comprobar que se muestra
+	// la página que corresponde con el listado usuarios existentes en el sistema.
+
 	@Test
 	public void PR12() {
-		assertTrue("PR12 sin hacer", false);
+		assertEquals(4, PO_RegisterView.checkSearchForm(driver, ""));
+		// logout
+		PO_HomeView.clickOption(driver, "logout", "class", "btn btn-primary");
 	}
 
-	// PR13. Sin hacer /
+	// [Prueba13] Hacer una búsqueda escribiendo en el campo un texto que no exista
+	// y comprobar que se muestra la página que corresponde, con la lista de
+	// usuarios vacía
 	@Test
 	public void PR13() {
-		assertTrue("PR13 sin hacer", false);
+		assertEquals(0, PO_RegisterView.checkSearchForm(driver, "ñ"));
 	}
 
-	// PR14. Sin hacer /
+	// [Prueba14] Hacer una búsqueda con un texto específico y comprobar que se
+	// muestra la página que corresponde, con la lista de usuarios en los que el
+	// texto especificados sea parte de su nombre, apellidos o de su email.
 	@Test
 	public void PR14() {
-		assertTrue("PR14 sin hacer", false);
+		assertEquals(1, PO_RegisterView.checkSearchForm(driver, "prueba1@prueba1.com"));
+		// logout
+		PO_HomeView.clickOption(driver, "logout", "class", "btn btn-primary");
 	}
 
-	// PR15. Sin hacer /
+	// [Prueba15] Desde el listado de usuarios de la aplicación, enviar una
+	// invitación de amistad a un usuario. Comprobar que la solicitud de amistad
+	// aparece en el listado de invitaciones (punto siguiente).
 	@Test
 	public void PR15() {
-		assertTrue("PR15 sin hacer", false);
+
+		// log as prueba1
+		PO_HomeView.loginForm(driver, "class", "btn btn-primary", "login", "prueba1@prueba1.com", "123");
+		PO_View.checkElement(driver, "id", "tableUsers");
+
+		// send invitation to prueba2
+		PO_View.checkElement(driver, "id", "tableUsers");
+
+		List<WebElement> elementos = PO_HomeView.checkElement(driver, "free",
+				"//td[contains(text(), 'prueba2')]/following-sibling::*/a[contains(@href, 'invitation/send/')]");
+		elementos.get(0).click();
+
+		// wait for message success
+		PO_View.checkElement(driver, "text", "Invitacion enviada");
+		// log out
+		PO_HomeView.clickOption(driver, "logout", "class", "btn btn-primary");
+
+		// log in with other user
+		// invitations
+		// look
+		// assertTrue("PR15 sin hacer", false);
 	}
 
-	// PR16. Sin hacer /
+	// [Prueba16] Desde el listado de usuarios de la aplicación, enviar una
+	// invitación de amistad a un usuario al que ya le habíamos enviado la
+	// invitación previamente. No debería dejarnos enviar la invitación, se podría
+	// ocultar el botón de enviar invitación o notificar que ya había sido enviada
+	// previamente.
 	@Test
 	public void PR16() {
-		assertTrue("PR16 sin hacer", false);
+		// login as prueba1
+		PO_HomeView.loginForm(driver, "class", "btn btn-primary", "login", "prueba1@prueba1.com", "123");
+		PO_View.checkElement(driver, "id", "tableUsers");
+
+		// send invitation to prueba2
+		PO_View.checkElement(driver, "id", "tableUsers");
+
+		List<WebElement> elementos = PO_HomeView.checkElement(driver, "free",
+				"//td[contains(text(), 'prueba2')]/following-sibling::*/a[contains(@href, 'invitation/send/')]");
+		elementos.get(0).click();
+
+		// wait for message error
+		PO_View.checkElement(driver, "text", "Ya existe una invitacion");
+		// log out
+		PO_HomeView.clickOption(driver, "logout", "class", "btn btn-primary");
 	}
 
-	// PR017. Sin hacer /
+	
+	// [Prueba17] Mostrar el listado de invitaciones de amistad recibidas. Comprobar
+	// con un listado que contenga varias invitaciones recibidas.
+
 	@Test
 	public void PR17() {
-		assertTrue("PR17 sin hacer", false);
+		// prueba2 ya ha recibido una petición -> enviamos otra
+		
+		// log as prueba3
+		PO_HomeView.loginForm(driver, "class", "btn btn-primary", "login", "prueba3@prueba3.com", "prueba3");
+		PO_View.checkElement(driver, "id", "tableUsers");
+
+		// send invitation to prueba2
+		PO_View.checkElement(driver, "id", "tableUsers");
+
+		List<WebElement> elementos = PO_HomeView.checkElement(driver, "free",
+				"//td[contains(text(), 'prueba2')]/following-sibling::*/a[contains(@href, 'invitation/send/')]");
+		elementos.get(0).click();
+
+		// wait for message success
+		PO_View.checkElement(driver, "text", "Invitacion enviada");
+		// log out
+		 PO_HomeView.clickOption(driver, "logout", "class", "btn btn-primary");
+
+		// Con prueba2 comprobamos que tengamos dos invitaciones.
+		PO_HomeView.loginForm(driver, "class", "btn btn-primary", "login", "prueba2@prueba2.com", "prueba2");
+
+		PO_View.checkElement(driver, "id", "tableUsers");
+		PO_HomeView.clickOption(driver, "invitations");
+		PO_View.checkElement(driver, "text", "Invitaciones de amistad");
+
+		// check 2 invitations
+
+		assertEquals(2, PO_PrivateView.countInPagination(driver, "tableInvitations"));
+
+		// log out
+		 PO_HomeView.clickOption(driver, "logout", "class", "btn btn-primary");
+
 	}
 
-	// PR18. Sin hacer /
+	// [Prueba18] Sobre el listado de invitaciones recibidas. Hacer click en el
+	// botón/enlace de una de ellas y comprobar que dicha solicitud desaparece del
+	// listado de invitaciones.
+	
 	@Test
 	public void PR18() {
-		assertTrue("PR18 sin hacer", false);
+		//Accedemos con prueba2 -> tiene dos invitaciones
+		
+		
+		PO_HomeView.loginForm(driver, "class", "btn btn-primary", "login", "prueba2@prueba2.com", "prueba2");
+		PO_View.checkElement(driver, "id", "tableUsers");
+		PO_HomeView.clickOption(driver, "invitations");
+		PO_View.checkElement(driver, "text", "Invitaciones de amistad");
+
+		// 2 invitaciones
+		assertEquals(2, PO_PrivateView.countInPagination(driver, "tableInvitations"));
+
+		// aceptamos la de prueba3 -> Aceptar
+		
+		List<WebElement> elementos = PO_HomeView.checkElement(driver, "free",
+				"//td[contains(text(), 'prueba3')]/following-sibling::*/a[contains(@href, 'invitation/accept/')]");
+		elementos.get(0).click();
+		
+		//comprobamos que ha salido el mensaje Se ha añadido un amigo
+		PO_View.checkElement(driver, "text", "Se ha añadido un amigo");
+
+		// VOLVER A INVITATIONS
+		PO_HomeView.clickOption(driver, "invitations");
+		PO_View.checkElement(driver, "text", "Invitaciones de amistad");
+
+		// 1 invitaciones
+		assertEquals(1, PO_PrivateView.countInPagination(driver, "tableInvitations"));
+
+		
+		
+
+	// log out
+	 PO_HomeView.clickOption(driver, "logout", "class", "btn btn-primary");
+		
 	}
 
-	// PR19. Sin hacer /
+	// [Prueba19] Mostrar el listado de amigos de un usuario. Comprobar que el
+	// listado contiene los amigos que deben ser.
 	@Test
 	public void PR19() {
-		assertTrue("PR19 sin hacer", false);
+
+		// usuario prueba2 tiene 1 amigo
+
+		PO_HomeView.loginForm(driver, "class", "btn btn-primary", "login", "prueba2@prueba2.com", "prueba2");
+		PO_View.checkElement(driver, "id", "tableUsers");
+		PO_HomeView.clickOption(driver, "friendships");
+		PO_View.checkElement(driver, "text", "Amigos");
+
+		// contar 1 elemento en tableFriendships
+		assertEquals(1, PO_PrivateView.countInPagination(driver, "tableFriendships"));
+		// log out
+		PO_HomeView.clickOption(driver, "logout", "class", "btn btn-primary");
+		
+		
+		//DELETE FROM DATABASE friendships && invitations
+
 	}
 
 	// P20. Sin hacer /

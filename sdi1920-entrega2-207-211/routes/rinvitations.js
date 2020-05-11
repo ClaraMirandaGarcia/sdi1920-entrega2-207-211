@@ -43,7 +43,7 @@ module.exports = function (app, swig, gestorBD) {
                     gestorBD.obtainInvitations(criterioInvitation, function (invitations) {
                         if (invitations != null && invitations.length > 0) {
                             res.redirect("/users" +
-                                "?mensaje=Ya existe una invitación" +
+                                "?message=Ya existe una invitacion" +
                                 "&messageType=alert-danger ");
 
                         } else {
@@ -76,7 +76,7 @@ module.exports = function (app, swig, gestorBD) {
                                                     "&messageType=alert-danger ");
                                             } else {
                                                 res.redirect("/users" +
-                                                    "?message=Se envió correctamente" +
+                                                    "?message=Invitacion enviada" +
                                                     "&messageType=alert-success ");
                                             }
                                         })
@@ -193,8 +193,8 @@ module.exports = function (app, swig, gestorBD) {
                             //there was an error adding?
                         } else {
                             //redirect to list of friends.
-                            res.redirect("/users" +
-                                "?mensaje=Se ha añadido a un amigo"+
+                            res.redirect("/friendships" +
+                                "?message=Se ha añadido un amigo"+
                                 "&messageType=alert-success ");
                         }
                     })
