@@ -156,10 +156,21 @@ module.exports = function (app, gestorBD) {
                         } else {
 
                             //check user
+                            //criterio -> pillar todos userTo && userFrom
+                            let criterioArray = []
+
+                            //para cada amistad ->
+                            for(let i = 0; i<friendships.length; i++){
+                                criterioArray.push({_id: gestorBD.mongo.ObjectID(friendships[i].userFrom.toString())});
+                                criterioArray.push({_id: gestorBD.mongo.ObjectID(friendships[i].userTo.toString())});
+                            }
+                            let final = criterioArray.filter(
+                                (c) =>
+                                    c._id.toString() !== userSessionId
+                            );
+
                             let criterio = {
-                                $or: friendships.map((f) => {
-                                    return {_id: gestorBD.mongo.ObjectID(f.userFrom.toString())}
-                                })
+                                $or: final
                             }
 
                             gestorBD.getUsers(criterio, (users) => {

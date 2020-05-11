@@ -47,8 +47,6 @@ module.exports = function (app, swig, gestorBD) {
                             criterioArray.push({_id: gestorBD.mongo.ObjectID(friendships[i].userFrom.toString())});
                             criterioArray.push({_id: gestorBD.mongo.ObjectID(friendships[i].userTo.toString())});
                         }
-
-
                         let final = criterioArray.filter(
                             (c) =>
                                 c._id.toString() !== userSessionId
