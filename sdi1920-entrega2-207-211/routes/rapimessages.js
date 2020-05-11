@@ -168,9 +168,9 @@ module.exports = function (app, gestorBD) {
                             //check user
                             //criterio -> pillar todos userTo && userFrom
                             let criterioArray = []
-
+                            let sorted = friendships.sort((a, b) => b.dateUpdate - a.dateUpdate);
                             //para cada amistad ->
-                            for(let i = 0; i<friendships.length; i++){
+                            for (let i = 0; i < friendships.length; i++) {
                                 criterioArray.push({_id: gestorBD.mongo.ObjectID(friendships[i].userFrom.toString())});
                                 criterioArray.push({_id: gestorBD.mongo.ObjectID(friendships[i].userTo.toString())});
                             }
@@ -182,7 +182,6 @@ module.exports = function (app, gestorBD) {
                             let criterio = {
                                 $or: final
                             }
-
                             gestorBD.getUsers(criterio, (users) => {
 
                                 if (users == null) {
@@ -195,15 +194,26 @@ module.exports = function (app, gestorBD) {
 
                                     let usersAux = [];
                                     //eliminar de users al usuario en sesión
+                                    let sortedUsers = [];
+                                    sorted.forEach(function (key) {
+                                        let found = false;
+                                        users = users.filter(function (user) {
+                                            if (!found && (user._id.toString() === key.userFrom.toString() || user._id.toString() === key.userTo.toString())){
+                                                sortedUsers.push(user);
+                                                found = true;
+                                                return false;
+                                            } else
+                                                return true;
+                                        })
 
-                                    for (let i = 0; i < users.length; i++) {
-                                        let userSpecific = users[i]._id.toString();
+                                    })
+                                    for (let i = 0; i < sortedUsers.length; i++) {
+                                        let userSpecific = sortedUsers[i]._id.toString();
 
                                         if (userSpecific != userSessionId) {
-                                            usersAux.push(users[i]);
+                                            usersAux.push(sortedUsers[i]);
                                         }
                                     }
-
                                     res.status(200);
                                     res.json(JSON.stringify(usersAux));
                                 }
