@@ -154,6 +154,7 @@ module.exports = function (app, gestorBD) {
             } else {
 
                 let userSessionCompl = users[0];
+                let userSessionId = userSessionCompl._id.toString();
                 let userSession = gestorBD.mongo.ObjectID(userSessionCompl._id.toString());
 
 
@@ -201,9 +202,19 @@ module.exports = function (app, gestorBD) {
                                     });
                                 } else {
 
+                                    let usersAux = [];
+                                    //eliminar de users al usuario en sesión
+
+                                    for(let i = 0; i<users.length; i++ ){
+                                        let userSpecific = users[i]._id.toString();
+
+                                        if(userSpecific != userSessionId){
+                                            usersAux.push(users[i]);
+                                        }
+                                    }
 
                                     res.status(200);
-                                    res.json(JSON.stringify(users));
+                                    res.json(JSON.stringify(usersAux));
                                 }
                             });
 
