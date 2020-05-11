@@ -31,6 +31,50 @@ public class DatabaseUtils {
 		mongoClient.close();
 	}
 
+	public static void removeUser(String email) {
+		// obtener database
+		MongoDatabase db = getConnection();
+		// obtener coleccion
+		MongoCollection<Document> friendshipCollection = db.getCollection("users");
+
+		Bson friendshipFilter = Filters.eq("email", email);
+		friendshipCollection.deleteMany(friendshipFilter);
+	}
+
+	public static void removeAllFriendshipsOfUserEmail(String emailUser) {
+
+		// obtener ids
+		String idUser = getIdFromUserEmail(emailUser);
+
+		// obtener database
+		MongoDatabase db = getConnection();
+
+		// obtener coleccion
+		MongoCollection<Document> friendshipCollection = db.getCollection("friendship");
+
+		Bson friendshipFilter = Filters.or(Filters.eq("userFrom", new ObjectId(idUser)),
+				Filters.eq("userTo", new ObjectId(idUser)));
+
+		friendshipCollection.deleteMany(friendshipFilter);
+	}
+
+	public static void removeAllInvitationsOfUserEmail(String emailUser) {
+
+		// obtener ids
+		String idUser = getIdFromUserEmail(emailUser);
+
+		// obtener database
+		MongoDatabase db = getConnection();
+
+		// obtener coleccion
+		MongoCollection<Document> friendshipCollection = db.getCollection("invitations");
+
+		Bson friendshipFilter = Filters.or(Filters.eq("userFrom", new ObjectId(idUser)),
+				Filters.eq("userTo", new ObjectId(idUser)));
+
+		friendshipCollection.deleteMany(friendshipFilter);
+	}
+
 	public static void removeAllMessagesUsers(String emailUserFrom, String emailUserTo) {
 		// obtener database
 		MongoDatabase db = getConnection();
@@ -97,6 +141,27 @@ public class DatabaseUtils {
 
 		// obtener coleccion
 		MongoCollection<Document> friendshipCollection = db.getCollection("friendship");
+
+		Bson friendshipFilter = Filters.or(
+				Filters.and(Filters.eq("userFrom", new ObjectId(idUserFrom)),
+						Filters.eq("userTo", new ObjectId(idUserTo))),
+				Filters.and(Filters.eq("userFrom", new ObjectId(idUserTo)),
+						Filters.eq("userTo", new ObjectId(idUserFrom))));
+
+		friendshipCollection.deleteMany(friendshipFilter);
+	}
+
+	public static void removeInvitation(String emailUserFrom, String emailUserTo) {
+
+		// obtener ids
+		String idUserFrom = getIdFromUserEmail(emailUserFrom);
+		String idUserTo = getIdFromUserEmail(emailUserTo);
+
+		// obtener database
+		MongoDatabase db = getConnection();
+
+		// obtener coleccion
+		MongoCollection<Document> friendshipCollection = db.getCollection("invitations");
 
 		Bson friendshipFilter = Filters.or(
 				Filters.and(Filters.eq("userFrom", new ObjectId(idUserFrom)),

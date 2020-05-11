@@ -18,6 +18,7 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.firefox.FirefoxDriver;
+import org.seleniumhq.jetty9.server.session.DatabaseAdaptor;
 
 import com.uniovi.tests.pageobjects.PO_ChatView;
 //Paquetes con los Page Object
@@ -27,6 +28,7 @@ import com.uniovi.tests.pageobjects.PO_PrivateView;
 import com.uniovi.tests.pageobjects.PO_Properties;
 import com.uniovi.tests.pageobjects.PO_RegisterView;
 import com.uniovi.tests.pageobjects.PO_View;
+import com.uniovi.tests.util.DatabaseUtils;
 //Paquetes Utilidades de Testing Propias
 import com.uniovi.tests.util.SeleniumUtils;
 
@@ -35,9 +37,8 @@ import com.uniovi.tests.util.SeleniumUtils;
 public class SocianNetworkTest {
 
 	static String PathFirefox65 = "C:\\Program Files\\Mozilla Firefox\\firefox.exe";
-	// static String Geckdriver024 =
-	// "C:\\Users\\CMG\\Desktop\\Tercero\\2_Cuatrimestre\\SDI\\Laboratorio\\Material\\PL-SDI-Sesión5-material\\PL-SDI-Sesión5-material\\geckodriver024win64.exe";
-	static String Geckdriver024 = "C:\\Users\\AGM-PC\\Documents\\GitHub\\SDI\\PL-SDI-Sesión5-material\\geckodriver024win64.exe";
+	static String Geckdriver024 = "C:\\Users\\CMG\\Desktop\\Tercero\\2_Cuatrimestre\\SDI\\Laboratorio\\Material\\PL-SDI-Sesión5-material\\PL-SDI-Sesión5-material\\geckodriver024win64.exe";
+//	static String Geckdriver024 = "C:\\Users\\AGM-PC\\Documents\\GitHub\\SDI\\PL-SDI-Sesión5-material\\geckodriver024win64.exe";
 	static WebDriver driver = getDriver(PathFirefox65, Geckdriver024);
 	static String URL = "https://localhost:8081";
 
@@ -68,6 +69,11 @@ public class SocianNetworkTest {
 
 	@AfterClass
 	static public void end() {
+		// eliminar todas las amistades del prueba2
+		DatabaseUtils.removeAllFriendshipsOfUserEmail("prueba2@prueba2.com");
+		// eliminar todas las invitaciones del prueba2
+		DatabaseUtils.removeAllInvitationsOfUserEmail("prueba2@prueba2.com");
+
 		// Cerramos el navegador al finalizar las pruebas
 		driver.quit();
 	}
@@ -75,6 +81,8 @@ public class SocianNetworkTest {
 	// PR01. Registro de Usuario con datos válidos
 	@Test
 	public void PR01() {
+		String email = "newEmail@whatever.xd";
+		DatabaseUtils.removeUser(email);
 		PO_RegisterView.checkUserDoesNotExist(driver, "newEmail@whatever.xd");
 		PO_RegisterView.register(driver, "newEmail@whatever.xd", "bestname", "suchlastname", "100%secure",
 				"100%secure");
@@ -189,13 +197,13 @@ public class SocianNetworkTest {
 
 	}
 
-	// PR11. Sin hacer /
+	// PR11.
 	@Test
 	public void PR11() {
 		PO_HomeView.loginForm(driver, "class", "btn btn-primary", "login", "prueba1@prueba1.com", "123");
 		PO_View.checkElement(driver, "id", "tableUsers");
 
-		assertEquals(4, PO_PrivateView.countInPagination(driver, "tableUsers"));
+		assertEquals(DatabaseUtils.countUsers(), PO_PrivateView.countInPagination(driver, "tableUsers"));
 
 		// logout
 		PO_HomeView.clickOption(driver, "logout", "class", "btn btn-primary");
@@ -207,7 +215,7 @@ public class SocianNetworkTest {
 
 	@Test
 	public void PR12() {
-		assertEquals(4, PO_RegisterView.checkSearchForm(driver, ""));
+		assertEquals(DatabaseUtils.countUsers(), PO_RegisterView.checkSearchForm(driver, ""));
 		// logout
 		PO_HomeView.clickOption(driver, "logout", "class", "btn btn-primary");
 	}
@@ -235,6 +243,13 @@ public class SocianNetworkTest {
 	// aparece en el listado de invitaciones (punto siguiente).
 	@Test
 	public void PR15() {
+		String emailUserFrom = "prueba1@prueba1.com";
+		String emailUserTo = "prueba2@prueba2.com";
+
+		// Just in case remove friendship
+		DatabaseUtils.removeFriendship(emailUserFrom, emailUserTo);
+		// Just in case remove invitation.
+		DatabaseUtils.removeInvitation(emailUserFrom, emailUserTo);
 
 		// log as prueba1
 		PO_HomeView.loginForm(driver, "class", "btn btn-primary", "login", "prueba1@prueba1.com", "123");
@@ -252,10 +267,6 @@ public class SocianNetworkTest {
 		// log out
 		PO_HomeView.clickOption(driver, "logout", "class", "btn btn-primary");
 
-		// log in with other user
-		// invitations
-		// look
-		// assertTrue("PR15 sin hacer", false);
 	}
 
 	// [Prueba16] Desde el listado de usuarios de la aplicación, enviar una
@@ -288,6 +299,13 @@ public class SocianNetworkTest {
 	@Test
 	public void PR17() {
 		// prueba2 ya ha recibido una petición -> enviamos otra
+		String emailUserFrom = "prueba3@prueba3.com";
+		String emailUserTo = "prueba2@prueba2.com";
+
+		// Just in case remove friendship
+		DatabaseUtils.removeFriendship(emailUserFrom, emailUserTo);
+		// Just in case remove invitation.
+		DatabaseUtils.removeInvitation(emailUserFrom, emailUserTo);
 
 		// log as prueba3
 		PO_HomeView.loginForm(driver, "class", "btn btn-primary", "login", "prueba3@prueba3.com", "prueba3");
@@ -363,7 +381,7 @@ public class SocianNetworkTest {
 	@Test
 	public void PR19() {
 
-		// usuario prueba2 tiene 1 amigo
+		// usuario prueba2 tiene 1 amigo prueba3
 
 		PO_HomeView.loginForm(driver, "class", "btn btn-primary", "login", "prueba2@prueba2.com", "prueba2");
 		PO_View.checkElement(driver, "id", "tableUsers");
@@ -376,6 +394,11 @@ public class SocianNetworkTest {
 		PO_HomeView.clickOption(driver, "logout", "class", "btn btn-primary");
 
 		// DELETE FROM DATABASE friendships && invitations
+		String emailUserFrom = "prueba3@prueba3.com";
+		String emailUserTo = "prueba2@prueba2.com";
+
+		// Para dejarlo como estaba
+		DatabaseUtils.removeFriendship(emailUserFrom, emailUserTo);
 
 	}
 
@@ -430,6 +453,20 @@ public class SocianNetworkTest {
 	// tres amigos
 	@Test
 	public void PR25() {
+
+		String emailTo = "tengo3amigos@gmail.com";
+		// Borrar todas las amistades
+		DatabaseUtils.removeAllFriendshipsOfUserEmail(emailTo);
+
+		// Crear amistad con tengo3amigos
+		String email1 = "asdf@gmail.com";
+		String email2 = "prueba1@prueba1.com";
+		String email3 = "prueba2@prueba2.com";
+
+		DatabaseUtils.createFriendship(emailTo, email1);
+		DatabaseUtils.createFriendship(emailTo, email2);
+		DatabaseUtils.createFriendship(emailTo, email3);
+
 		PO_HomeView.clickOption(driver, "cliente.html");
 		PO_View.checkElement(driver, "id", "widget-login");
 		PO_LoginView.fillFormApi(driver, "tengo3amigos@gmail.com", "tengo3amigos");
@@ -449,6 +486,19 @@ public class SocianNetworkTest {
 
 	@Test
 	public void PR26() {
+		String emailTo = "tengo3amigos@gmail.com";
+		// Borrar todas las amistades
+		DatabaseUtils.removeAllFriendshipsOfUserEmail(emailTo);
+
+		// Crear amistad con tengo3amigos
+		String email1 = "asdf@gmail.com";
+		String email2 = "prueba1@prueba1.com";
+		String email3 = "prueba2@prueba2.com";
+
+		DatabaseUtils.createFriendship(emailTo, email1);
+		DatabaseUtils.createFriendship(emailTo, email2);
+		DatabaseUtils.createFriendship(emailTo, email3);
+
 		PO_HomeView.clickOption(driver, "cliente.html");
 		PO_View.checkElement(driver, "id", "widget-login");
 		PO_LoginView.fillFormApi(driver, "tengo3amigos@gmail.com", "tengo3amigos");
@@ -480,18 +530,28 @@ public class SocianNetworkTest {
 
 	// [Prueba28] Acceder a la lista de mensajes de un amigo “chat” y crear un nuevo
 	// mensaje, validar que el mensaje aparece en la lista de mensajes.
+
 	@Test
 	public void PR28() {
+
+		String emailTo = "tengo3amigos@gmail.com";
+		// Crear amistad con tengo3amigos
+		String email2 = "prueba2@prueba2.com";
+		DatabaseUtils.createFriendship(emailTo, email2);
+
+		// Eliminar todos los mensajes tengo3amigos && prueba2
+		DatabaseUtils.removeAllMessagesUsers(emailTo, email2);
+
 		PO_HomeView.loginApiForm(driver, "tengo3amigos@gmail.com", "tengo3amigos");
-		
-		//id -> prueba2 = 5eb8193dbb06acf8338e9150
+
+		// id -> prueba2 = 5eb8193dbb06acf8338e9150
 		List<WebElement> row = PO_View.checkElement(driver, "id", "5eb8193dbb06acf8338e9150");
 		row.get(0).findElement(By.className("friendData")).click();
-		
-		//crear && enviar mensaje
+
+		// crear && enviar mensaje
 		String mensaje = "MensajeTest28";
-		PO_ChatView.createSendMessage(mensaje, driver);	
-		
+		PO_ChatView.createSendMessage(mensaje, driver);
+
 	}
 
 	// PR029. Identificarse en la aplicación y enviar un mensaje a un amigo, validar
@@ -513,7 +573,7 @@ public class SocianNetworkTest {
 		search.sendKeys(mensaje);
 		WebElement sendButton = driver.findElement(By.id("addMessage"));
 		sendButton.click();
-		PO_View.checkElement(driver, "text", mensaje);	
+		PO_View.checkElement(driver, "text", mensaje);
 		driver.navigate().to(URL);
 		PO_HomeView.loginApiForm(driver, "alejan1579@gmail.com", "123");
 		row = PO_View.checkElement(driver, "id", "5eb58934a546330b2c522761");
@@ -533,35 +593,41 @@ public class SocianNetworkTest {
 	// validar que los mensajes enviados aparecen en el chat. Identificarse después
 	// con el usuario que recibido el mensaje y validar que el número de mensajes
 	// sin leer aparece en la propia lista de amigos
-	
+
 	@Test
 	public void PR30() {
-		//asdf no tiene más amigos
+		String emailTo = "tengo3amigos@gmail.com";
+		// Crear amistad con asdf
+		String email2 = "asdf@gmail.com";
+		DatabaseUtils.createFriendship(emailTo, email2);
+		// erase messages
+		DatabaseUtils.removeAllMessagesUsers(emailTo, email2);
+
+		// asdf no tiene más amigos
 		PO_HomeView.loginApiForm(driver, "tengo3amigos@gmail.com", "tengo3amigos");
-		
-		//id -> asdf = 5eb58d1df805e44eda6da88d
+
+		// id -> asdf = 5eb58d1df805e44eda6da88d
 		List<WebElement> row = PO_View.checkElement(driver, "id", "5eb58d1df805e44eda6da88d");
 		row.get(0).findElement(By.className("friendData")).click();
-		
-		//crear && enviar mensaje
+
+		// crear && enviar mensaje
 		String mensaje01 = "MensajeTest30_01";
-		PO_ChatView.createSendMessage(mensaje01, driver);	
+		PO_ChatView.createSendMessage(mensaje01, driver);
 		String mensaje02 = "MensajeTest30_02";
-		PO_ChatView.createSendMessage(mensaje02, driver);	
+		PO_ChatView.createSendMessage(mensaje02, driver);
 		String mensaje03 = "MensajeTest30_03";
-		PO_ChatView.createSendMessage(mensaje03, driver);	
-		
-		//Botón volver
+		PO_ChatView.createSendMessage(mensaje03, driver);
+
+		// Botón volver
 		WebElement returnButton = driver.findElement(By.id("volverApp"));
 		returnButton.click();
-		//Iniciar sesión
+		// Iniciar sesión
 		PO_HomeView.loginApiForm(driver, "asdf@gmail.com", "asdf");
-		//chat -> tengo3amigos@gmail.com. 5eb92576209b0415355b6270
-		
-		
-		//check 3 unread messages en la lista de amigos
+		// chat -> tengo3amigos@gmail.com. 5eb92576209b0415355b6270
+
+		// check 3 unread messages en la lista de amigos
 		PO_View.checkElement(driver, "text", "3");
-		
+
 	}
 
 	// PR031. Identificarse con un usuario A que al menos tenga 3 amigos, ir al chat
@@ -581,23 +647,25 @@ public class SocianNetworkTest {
 		// ir al chat del ultimo amigo de la lista
 		String lastEmail = PO_HomeView.lastApiFriend(driver);
 		// y enviarle un mensaje
-		PO_HomeView.sendApiMessage(driver,"MensajeTest31_1");
+		PO_HomeView.sendApiMessage(driver, "MensajeTest31_1");
 		// volver a la lista de amigos
 		driver.navigate().to(URL);
 		PO_HomeView.loginApiForm(driver, "alejan1579@gmail.com", "123");
-		// comprobar que el usuario al que se le ha enviado el mensaje esta en primera posición
+		// comprobar que el usuario al que se le ha enviado el mensaje esta en primera
+		// posición
 		String firstEmail = PO_HomeView.firstApiEmail(driver);
 		assertTrue(lastEmail.equals(firstEmail));
-		//Identificarse con el usuario B
+		// Identificarse con el usuario B
 		driver.navigate().to(URL);
 		PO_HomeView.loginApiForm(driver, lastEmail, "123");
 		// enviarle un mensaje al usuario A.
-		PO_HomeView.gotoApiEmail(driver,"alejan1579@gmail.com");
-		PO_HomeView.sendApiMessage(driver,"MensajeTest31_2");
-		//Volver a identificarse con el usuario A
+		PO_HomeView.gotoApiEmail(driver, "alejan1579@gmail.com");
+		PO_HomeView.sendApiMessage(driver, "MensajeTest31_2");
+		// Volver a identificarse con el usuario A
 		driver.navigate().to(URL);
 		PO_HomeView.loginApiForm(driver, "alejan1579@gmail.com", "123");
-		//ver que el usuario que acaba de mandarle el mensaje es el primero en su lista de amigos.
+		// ver que el usuario que acaba de mandarle el mensaje es el primero en su lista
+		// de amigos.
 		firstEmail = PO_HomeView.firstApiEmail(driver);
 		assertTrue(firstEmail.equals(lastEmail));
 	}
