@@ -193,8 +193,8 @@ module.exports = function (app, swig, gestorBD) {
                             //there was an error adding?
                         } else {
                             //redirect to list of friends.
-                            res.redirect("/users" +
-                                "?mensaje=Se ha añadido a un amigo"+
+                            res.redirect("/friendships" +
+                                "?message=Se ha añadido un amigo"+
                                 "&messageType=alert-success ");
                         }
                     })

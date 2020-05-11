@@ -37,14 +37,14 @@ public class PO_PrivateView extends PO_NavView {
 		PO_View.checkElement(driver, typeOption, textOption).get(0).click();
 	}
 
-	public static int countInPagination(WebDriver driver) {
+	public static int countInPagination(WebDriver driver, String table) {
 		int total = 0;
 		boolean whileNext = true;
 		int i = 2;
 		
 		do {
 
-			List<WebElement> users = driver.findElements(By.xpath("//*[@id=\"tableUsers\"]/tbody/tr"));
+			List<WebElement> users = driver.findElements(By.xpath("//*[@id=\""+table+"\"]/tbody/tr"));
 			total += users.size();
 			
 			List<WebElement> elementos = driver.findElements(By.xpath("//*[@id=\"pi-"+i+"\"]/a"));

@@ -101,7 +101,7 @@ public class PO_RegisterView extends PO_NavView {
 		driver.findElement(boton).click();
 		
 		//count
-		return PO_PrivateView.countInPagination(driver);
+		return PO_PrivateView.countInPagination(driver, "tableUsers");
 	}
 
 }
