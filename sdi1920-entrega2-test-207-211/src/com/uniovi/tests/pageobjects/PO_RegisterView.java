@@ -86,4 +86,22 @@ public class PO_RegisterView extends PO_NavView {
 	        PO_RegisterView.checkUserDoesNotExist(driver, textToCheck);
 	    }
 
+	public static Object checkSearchForm(WebDriver driver, String string) {
+		//log in
+		PO_HomeView.loginForm(driver, "class", "btn btn-primary", "login", "prueba1@prueba1.com", "123");
+		PO_View.checkElement(driver, "id", "tableUsers");
+		
+		//search
+		WebElement search = driver.findElement(By.name("busqueda"));
+		search.click();
+		search.clear();
+		search.sendKeys(string);
+		
+		By boton = By.id("submitUserSearch");
+		driver.findElement(boton).click();
+		
+		//count
+		return PO_PrivateView.countInPagination(driver);
+	}
+
 }
