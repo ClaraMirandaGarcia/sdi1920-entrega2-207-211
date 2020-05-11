@@ -24,8 +24,6 @@ module.exports = function (app, gestorBD) {
 
     function checkReceptor(criterio, usuario, callback) {
         gestorBD.obtainMessage(criterio, function (messages) {
-            console.log(messages[0].destino)
-            console.log(usuario)
             if (usuario && messages[0].destino === usuario) {
                 callback(null)
             } else {
@@ -33,11 +31,12 @@ module.exports = function (app, gestorBD) {
             }
         })
     }
-    app.put("/api/message/markRead/:id", function (req, res ) {
+
+    app.put("/api/message/markRead/:id", function (req, res) {
         let criterio = {"_id": gestorBD.mongo.ObjectID(req.params.id)};
-        checkReceptor(criterio,res.usuario, function (errorMessage) {
-            if (errorMessage == null){
-                gestorBD.markRead(criterio,function (result) {
+        checkReceptor(criterio, res.usuario, function (errorMessage) {
+            if (errorMessage == null) {
+                gestorBD.markRead(criterio, function (result) {
                     if (result == null) {
                         res.status(500);
                         res.json({
@@ -51,7 +50,7 @@ module.exports = function (app, gestorBD) {
                         })
                     }
                 })
-            }else {
+            } else {
                 res.status(500);
                 res.json({
                     error: errorMessage
@@ -59,14 +58,16 @@ module.exports = function (app, gestorBD) {
             }
         })
     });
+
+
     app.post("/api/message/send", function (req, res) {
 
         let criterioEmisor = {
-            email: res.usuario.email
+            email: res.usuario
         }
 
         let criterioSender = {
-            email: res.body.destino
+            email: req.body.destino
         }
 
         let criterioUsers = {
@@ -75,6 +76,7 @@ module.exports = function (app, gestorBD) {
 
         gestorBD.getUsers(criterioUsers, function (users, total) {
             if (users == null || users.length < 2) {
+
                 res.status(500);
                 res.json({
                     error: "Error al obtener los usuarios del mensaje "
@@ -82,62 +84,30 @@ module.exports = function (app, gestorBD) {
             } else {
 
                 //both users were found
-                let user1 = users[0];
-                let user2 = users[1];
 
-                let user1Id = gestorBD.mongo.ObjectID(user1._id.toString());
-                let user2Id = gestorBD.mongo.ObjectID(user2._id.toString());
-
-                //check if they're friends by their ids
-                let criterioFrom = {
-                    userFrom: user1Id,
-                    userTo: user2Id
+                //create the message
+                let message = {
+                    emisor: res.usuario, // -> BY EMAIL
+                    destino: req.body.destino, // -> BY EMAIL
+                    texto: req.body.texto,
+                    leido: false,
                 }
 
-                let criterioTo = {
-                    userFrom: user2Id,
-                    userTo: user1Id
-                }
-
-                let criterioFriend = {
-                    $or: [criterioFrom, criterioTo]
-                }
-
-                gestorBD.obtainFriendships(criterioFriend, function (friendships) {
-                    if (friendships == null || friendships.length < 1) {
-                        //they are not friends
-                        res.status(500);
+                //insert the message
+                gestorBD.insertMessage(message, (id) => {
+                    if (id) {
+                        res.status(200);
                         res.json({
-                            error: "No eres amigo de ese usuario"
+                            mensaje: "Enviado correctamente",
+                            _id: id
                         });
                     } else {
-                        //they are friends
-
-                        //create the message
-                        let message = {
-                            emisor: res.usuario.email, // -> BY EMAIL
-                            destino: req.body.destino, // -> BY EMAIL
-                            texto: req.body.texto,
-                            leido: false,
-                        }
-
-                        //insert the message
-                        gestorBD.insertMessage(message, (id) => {
-                            if (id) {
-                                res.status(200);
-                                res.json({
-                                    mensaje: "Enviado correctamente",
-                                    _id: id
-                                });
-                            } else {
-                                res.status(500);
-                                res.json({
-                                    error: "Error: no se pudo mandar el mensaje"
-                                });
-                            }
+                        res.status(500);
+                        res.json({
+                            error: "Error: no se pudo mandar el mensaje"
                         });
                     }
-                })
+                });
             }
         });
 
@@ -177,13 +147,13 @@ module.exports = function (app, gestorBD) {
                         });
                     } else {
 
-                        if(friendships.length == 0){
+                        if (friendships.length == 0) {
                             let users = [];
 
                             res.status(200);
                             res.json(JSON.stringify(users));
 
-                        } else{
+                        } else {
 
                             //check user
                             let criterio = {
@@ -205,10 +175,10 @@ module.exports = function (app, gestorBD) {
                                     let usersAux = [];
                                     //eliminar de users al usuario en sesión
 
-                                    for(let i = 0; i<users.length; i++ ){
+                                    for (let i = 0; i < users.length; i++) {
                                         let userSpecific = users[i]._id.toString();
 
-                                        if(userSpecific != userSessionId){
+                                        if (userSpecific != userSessionId) {
                                             usersAux.push(users[i]);
                                         }
                                     }

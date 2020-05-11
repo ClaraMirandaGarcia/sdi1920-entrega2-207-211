@@ -71,30 +71,35 @@
     function newMessage() {
 
         // get all data
-        let emisor;
-        let destino;
-        let texto;
-        let leido = false;
+        let destino = emailObjetivo;
+        let texto = $("#newMessage").val();
 
-        $.ajax({
-            url: URLbase + "/message/send",
-            type: "POST",
-            data: {
-                emisor: emisor,
-                destino: destino,
-                texto: texto,
-                leido: leido
-            },
-            dataType: 'json',
-            headers: {"token": token},
-            success: function (respuesta) {
-                //show chat?
-                getConversacion();
-            },
-            error: function (error) {
-                $("#contenedor-principal").load("widget-login.html");
-            }
-        });
+        if(texto === ""){
+            return ;
+        } else{
+            $.ajax({
+
+                url: URLbase + "/message/send",
+                type: "POST",
+                data: {
+                    destino: destino,
+                    texto: texto,
+                },
+                dataType: 'json',
+                headers: {"token": token},
+                success: function (respuesta) {
+                    //show chat?
+                    getConversacion();
+                },
+                error: function (error) {
+                    $("#contenedor-principal").load("widget-login.html");
+                }
+            });
+
+            $("#textArea-mensaje").val("");
+        }
+
+
 
     }
     var x = setInterval(getConversacion ,1000);

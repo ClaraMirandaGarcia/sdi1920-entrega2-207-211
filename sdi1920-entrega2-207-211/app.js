@@ -60,9 +60,13 @@ routerUsuarioToken.use(function (req, res, next) {
         res.json({acceso: false, mensaje: 'No hay Token'});
     }
 });
+
 app.use("/api/friendships", routerUsuarioToken);
 app.use("/api/message", routerUsuarioToken);
 app.use("/api/conversation", routerUsuarioToken);
+app.use("/api/message/send", routerUsuarioToken);
+
+///api/message/send
 
 //BodyParser
 app.use(bodyParser.json());
