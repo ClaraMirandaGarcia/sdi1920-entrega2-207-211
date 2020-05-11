@@ -1,5 +1,7 @@
 package com.uniovi.tests.pageobjects;
 
+import java.util.List;
+
 import org.openqa.selenium.*;
 
 import com.uniovi.tests.util.SeleniumUtils;
@@ -35,6 +37,41 @@ public class PO_HomeView extends PO_NavView {
 	public static void loginApiForm(WebDriver driver, String email, String user) {
 		PO_HomeView.clickOption(driver, "cliente.html","id","boton-login");
 		PO_LoginView.fillFormApi(driver, email, user);
+		
+	}
+
+	public static String lastApiFriend(WebDriver driver) {
+		List<WebElement> rows = PO_View.checkElement(driver, "class", "friendRow");
+		WebElement lastFriend = rows.get(rows.size() - 1);
+		List<WebElement> datas = lastFriend.findElements(By.className("friendData"));
+		String email = datas.get(datas.size() - 1).getAttribute("innerHTML");
+		lastFriend.findElement(By.className("friendData")).click();
+		return email;
+		
+	}
+
+	public static void sendApiMessage(WebDriver driver, String mensaje) {
+		WebElement search = driver.findElement(By.id("newMessage"));
+		search.click();
+		search.clear();
+		search.sendKeys(mensaje);
+		WebElement sendButton = driver.findElement(By.id("addMessage"));
+		sendButton.click();
+		PO_View.checkElement(driver, "text", mensaje);	
+		
+	}
+
+	public static String firstApiEmail(WebDriver driver) {
+		List<WebElement> rows = PO_View.checkElement(driver, "class", "friendRow");
+		WebElement firstFriend = rows.get(0);
+		List<WebElement> datasfirst = firstFriend.findElements(By.className("friendData"));
+		String emailfirst = datasfirst.get(datasfirst.size() - 1).getAttribute("innerHTML");
+		return emailfirst;
+	}
+
+	public static void gotoApiEmail(WebDriver driver, String email) {
+		List<WebElement> data = PO_View.checkElement(driver, "text", email);
+		data.get(0).click();
 		
 	}
 
