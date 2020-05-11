@@ -34,9 +34,9 @@ import com.uniovi.tests.util.SeleniumUtils;
 public class SocianNetworkTest {
 
 	static String PathFirefox65 = "C:\\Program Files\\Mozilla Firefox\\firefox.exe";
-	static String Geckdriver024 = "C:\\Users\\CMG\\Desktop\\Tercero\\2_Cuatrimestre\\SDI\\Laboratorio\\Material\\PL-SDI-Sesión5-material\\PL-SDI-Sesión5-material\\geckodriver024win64.exe";
-	// static String Geckdriver024 =
-	// "C:\\Users\\AGM-PC\\Documents\\GitHub\\SDI\\PL-SDI-Sesión5-material\\geckodriver024win64.exe";
+	//static String Geckdriver024 = "C:\\Users\\CMG\\Desktop\\Tercero\\2_Cuatrimestre\\SDI\\Laboratorio\\Material\\PL-SDI-Sesión5-material\\PL-SDI-Sesión5-material\\geckodriver024win64.exe";
+	static String Geckdriver024 =
+	 "C:\\Users\\AGM-PC\\Documents\\GitHub\\SDI\\PL-SDI-Sesión5-material\\geckodriver024win64.exe";
 	static WebDriver driver = getDriver(PathFirefox65, Geckdriver024);
 	static String URL = "https://localhost:8081";
 
@@ -378,22 +378,32 @@ public class SocianNetworkTest {
 
 	}
 
-	// P20. Sin hacer /
+	// P20. Intentar acceder sin estar autenticado a la opción de listado de
+	// usuarios. Se deberá volver al formulario de login.
 	@Test
 	public void PR20() {
-		assertTrue("PR20 sin hacer", false);
+		driver.get("https://localhost:8081/users");
+		PO_View.checkElement(driver, "id", "loginButton");
 	}
 
-	// PR21. Sin hacer /
+	// PR21. Intentar acceder sin estar autenticado a la opción de listado de
+	// invitaciones de amistad recibida de un usuario estándar. Se deberá volver al
+	// formulario de login
 	@Test
 	public void PR21() {
-		assertTrue("PR21 sin hacer", false);
+		driver.get("https://localhost:8081/invitations");
+		PO_View.checkElement(driver, "id", "loginButton");
 	}
 
-	// PR22. Sin hacer /
+	// PR22. Intentar acceder estando autenticado como usuario standard a la lista
+	// de amigos de otro usuario. Se deberá mostrar un mensaje de acción indebida.
 	@Test
 	public void PR22() {
-		assertTrue("PR22 sin hacer", false);
+		// Para acceder a la lista de amigos en nuestra aplicación se debe acceder a
+		// /friendships, sin parametros. Debido a esto por diseño es imposible ver la
+		// lista de amigos de otro usuario, pues la aplicación utiliza el usuario en
+		// sesión para obtenerla
+		assertTrue("PR22 no aplica", true);
 	}
 
 	// [Prueba23] Inicio de sesión con datos válidos.
@@ -435,7 +445,7 @@ public class SocianNetworkTest {
 //	[Prueba26] Acceder a la lista de amigos de un usuario, 
 //	y realizar un filtrado para encontrar a un amigo concreto, 
 //	el nombre a buscar debe coincidir con el de un amigo
-	
+
 	@Test
 	public void PR26() {
 		PO_HomeView.clickOption(driver, "cliente.html");
@@ -443,16 +453,15 @@ public class SocianNetworkTest {
 		PO_LoginView.fillFormApi(driver, "tengo3amigos@gmail.com", "tengo3amigos");
 		PO_View.checkElement(driver, "text", "Tus amigos");
 		SeleniumUtils.esperarSegundos(driver, 5);
-		
-		//search for prueba2
-		//name-filter
-		//refreshButton
+
+		// search for prueba2
+		// name-filter
+		// refreshButton
 		WebElement search = driver.findElement(By.id("name-filter"));
 		search.click();
 		search.clear();
 		search.sendKeys("prueba2");
-		
-		
+
 		SeleniumUtils.esperarSegundos(driver, 5);
 		assertEquals(1, PO_PrivateView.countInPagination(driver, "tableFriendship"));
 	}
