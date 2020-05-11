@@ -54,8 +54,6 @@
         frUnreadMessages = [];
         //iterate
         for (let i = 0; i < friendships.length; i++) {
-            console.log('AAAAAAAA')
-            console.log(friendships[i]);
             $.ajax({
                 url: URLbase + "/message/unread",
                 type: "POST",
@@ -104,14 +102,14 @@
         var friendsResult = [];
         var filter = $("#name-filter").val();
 
-        let jsonFormat = JSON.parse(friendships);
+        let jsonFormat = friendships;
         for (i = 0; i < jsonFormat.length; i++) {
 
             if (jsonFormat[i].name.indexOf(filter) != -1) {
                 friendsResult.push(jsonFormat[i]);
             }
         }
-        actualizarTabla(JSON.stringify(friendsResult));
+        actualizarTabla(friendsResult);
     });
 
 
