@@ -457,28 +457,28 @@ public class SocianNetworkTest {
 		assertEquals(1, PO_PrivateView.countInPagination(driver, "tableFriendship"));
 	}
 
-//	// PR27. Sin hacer /
-//	@Test
-//	public void PR27() {
-//		assertTrue("PR27 sin hacer", false);
-//	}
+	// PR27. Sin hacer /
+	@Test
+	public void PR27() {
+		assertTrue("PR27 sin hacer", false);
+	}
 
-//	// PR029. Sin hacer /
-//	@Test
-//	public void PR29() {
-//		assertTrue("PR29 sin hacer", false);
-//	}
-//
-//	// PR030. Sin hacer /
-//	@Test
-//	public void PR30() {
-//		assertTrue("PR30 sin hacer", false);
-//	}
-//
-//	// PR031. Sin hacer /
-//	@Test
-//	public void PR31() {
-//		assertTrue("PR31 sin hacer", false);
-//	}
+	// PR029. Sin hacer /
+	@Test
+	public void PR29() {
+		assertTrue("PR29 sin hacer", false);
+	}
+
+	// PR030. Sin hacer /
+	@Test
+	public void PR30() {
+		assertTrue("PR30 sin hacer", false);
+	}
+
+	// PR031. Sin hacer /
+	@Test
+	public void PR31() {
+		assertTrue("PR31 sin hacer", false);
+	}
 
 }
