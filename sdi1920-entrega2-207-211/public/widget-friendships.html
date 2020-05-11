@@ -17,7 +17,7 @@
         </tr>
         </thead>
 
-        <tbody id="tablaCuerpo">
+        <tbody id="tablaCuerpoAmigos">
         </tbody>
 
     </table>
@@ -28,6 +28,7 @@
 
     var friendships;
     var frUnreadMessages;
+    var unreadInterval;
 
     function loadFriendships() {
         $.ajax({
@@ -39,9 +40,8 @@
 
             success: function (respuesta) {
                 friendships = JSON.parse(respuesta);
-                console.log(friendships)
-                unreadMessages();
-                //actualizarTabla(friendships);
+                actualizarAutomaticamente();
+                //unreadMessages();
 
             },
             error: function (error) {
@@ -49,6 +49,14 @@
                 $("#contenedor-principal").load("widget-login.html");
             }
         });
+    }
+
+    function actualizarAutomaticamente(){
+        unreadMessages();
+        if (unreadInterval) {
+            clearInterval(unreadInterval);
+        }
+        unreadInterval = setInterval(() => unreadMessages(), 2000);
     }
 
     function unreadMessages() {
@@ -66,8 +74,7 @@
 
                 success: function (respuesta) {
                     frUnreadMessages[i] = (JSON.parse(respuesta));
-                    console.log(frUnreadMessages)
-                    actualizarTabla(frUnreadMessages);
+                    actualizarTablaFriendship(frUnreadMessages);
                 },
                 error: function (error) {
                     console.log(error);
@@ -78,16 +85,18 @@
 
     }
 
-    function actualizarTabla(friendships) {
-        $("#tablaCuerpo").empty(); // Vaciar la tabla
+    function actualizarTablaFriendship(friendships) {
+        $("#tablaCuerpoAmigos").empty(); // Vaciar la tabla
 
         //let friendships = JSON.parse(amigosMostrar);
         let numMessages;
         for (i = 0; i < friendships.length; i++) {
+            console.log(friendships);
 
             numMessages = friendships[i].numNonReadMessages || "0";
-            $("#tablaCuerpo")
-                .append("<tr class='friendRow' onclick=conversacion('" + friendships[i].email + "') id=" + friendships[i]._id + ">" +
+
+            $("#tablaCuerpoAmigos")
+                .append("<tr onclick=conversacion('" + friendships[i].email + "') id=" + friendships[i]._id + ">" +
                     "<td class='friendData'>" + friendships[i].name + "</td>" +
                     "<td class='friendData'>" + friendships[i].surname + "</td>" +
                     "<td class='friendData'>" + friendships[i].email + "</td>" +
@@ -110,7 +119,7 @@
                 friendsResult.push(jsonFormat[i]);
             }
         }
-        actualizarTabla(friendsResult);
+        actualizarTablaFriendship(friendsResult);
     });
 
 
