@@ -57,6 +57,7 @@
             $( "#contenedor-principal" ).load("widget-login.html");
         }
 
+
     }
 
     function clearNotifications() {
@@ -69,6 +70,12 @@
     function showNotification(text, style = "alert alert-danger"){
         clearNotifications();
         $("#notifications").prepend("<div class='"+style+"'>"+text+"</div>")
+    }
+
+    function conversacion(email) {
+        emailObjetivo = email;
+        $("#contenedor-principal").load("widget-conversacion.html");
+
     }
 
 

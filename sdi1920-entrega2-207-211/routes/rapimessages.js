@@ -4,13 +4,14 @@ module.exports = function (app, gestorBD) {
         let users = {
             $or: [{
                 emisor: req.body.u1,
-                destino: req.body.u2
+                destino: res.usuario
             }, {
-                emisor: req.body.u2,
+                emisor: res.usuario,
                 destino: req.body.u1
             }]
         };
         gestorBD.obtainMessage(users, function (messages) {
+
             if (messages == null) {
                 res.status(500);
                 res.json({error: "conversación no encontrada"})
