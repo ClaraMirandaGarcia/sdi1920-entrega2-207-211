@@ -276,7 +276,25 @@ module.exports = {
             }
         });
 
-    }
+    },
+    obtainNonreadMessages: function (criterio, funcionCallback) {
+        this.mongo.MongoClient.connect(this.app.get('db'), function (err, db) {
+            if (err) {
+                funcionCallback(null);
+            } else {
+                let collection = db.collection('messages');
+                collection.count(criterio,function (err, messagesNonRead) {
+                    if (err) {
+                        funcionCallback(null);
+                    } else {
+                        funcionCallback(messagesNonRead);
+                    }
+                    db.close();
+                });
+            }
+        });
+
+    },
 
 
 };
