@@ -481,20 +481,23 @@ public class SocianNetworkTest {
 	// mensaje, validar que el mensaje aparece en la lista de mensajes.
 	@Test
 	public void PR28() {
-		PO_HomeView.clickOption(driver, "cliente.html");
-		PO_View.checkElement(driver, "id", "widget-login");
-		PO_LoginView.fillFormApi(driver, "tengo3amigos@gmail.com", "tengo3amigos");
-		PO_View.checkElement(driver, "text", "Tus amigos");
+		PO_HomeView.loginApiForm(driver, "tengo3amigos@gmail.com", "tengo3amigos");
 		
-		//enviar mensaje a -> prueba2@prueba2.com
-		List<WebElement> users = SeleniumUtils.EsperaCargaPaginaxpath(driver, " /html/body/div[2]/div/div/div[1]/div/table/tbody/tr/td[1]", 3);
-		users.get(0).click();
+		//id -> prueba2 = 5eb8193dbb06acf8338e9150
+		List<WebElement> row = PO_View.checkElement(driver, "id", "5eb8193dbb06acf8338e9150");
+		row.get(0).findElement(By.className("friendData")).click();
 		
-		String text = "MensajeTest28";
-		PO_Client_ChatView.fillForm(driver, text);
+		//crear && enviar mensaje
+		String mensaje = "MensajeTest28";
+		WebElement search = driver.findElement(By.id("newMessage"));
+		search.click();
+		search.clear();
+		search.sendKeys(mensaje);
 		
-		SeleniumUtils.esperarSegundos(driver, 2);
-		SeleniumUtils.textoPresentePagina(driver, text);
+		WebElement sendButton = driver.findElement(By.id("addMessage"));
+		sendButton.click();
+		PO_View.checkElement(driver, "text", mensaje);	
+		
 	}
 
 	// PR029. Sin hacer /
