@@ -34,9 +34,9 @@ import com.uniovi.tests.util.SeleniumUtils;
 public class SocianNetworkTest {
 
 	static String PathFirefox65 = "C:\\Program Files\\Mozilla Firefox\\firefox.exe";
-	static String Geckdriver024 = "C:\\Users\\CMG\\Desktop\\Tercero\\2_Cuatrimestre\\SDI\\Laboratorio\\Material\\PL-SDI-Sesión5-material\\PL-SDI-Sesión5-material\\geckodriver024win64.exe";
-//	static String Geckdriver024 =
-//	 "C:\\Users\\AGM-PC\\Documents\\GitHub\\SDI\\PL-SDI-Sesión5-material\\geckodriver024win64.exe";
+	// static String Geckdriver024 =
+	// "C:\\Users\\CMG\\Desktop\\Tercero\\2_Cuatrimestre\\SDI\\Laboratorio\\Material\\PL-SDI-Sesión5-material\\PL-SDI-Sesión5-material\\geckodriver024win64.exe";
+	static String Geckdriver024 = "C:\\Users\\AGM-PC\\Documents\\GitHub\\SDI\\PL-SDI-Sesión5-material\\geckodriver024win64.exe";
 	static WebDriver driver = getDriver(PathFirefox65, Geckdriver024);
 	static String URL = "https://localhost:8081";
 
@@ -500,10 +500,39 @@ public class SocianNetworkTest {
 		
 	}
 
-	// PR029. Sin hacer /
+	// PR029. Identificarse en la aplicación y enviar un mensaje a un amigo, validar
+	// que el mensaje enviado
+	// aparece en el chat. Identificarse después con el usuario que recibido el
+	// mensaje y validar que tiene un
+	// mensaje sin leer, entrar en el chat y comprobar que el mensaje pasa a tener
+	// el estado leído.
 	@Test
 	public void PR29() {
-		assertTrue("PR29 sin hacer", false);
+		String texto = "asdsad";
+		PO_HomeView.loginApiForm(driver, "prueba1@prueba1.com", "123");
+		List<WebElement> row = PO_View.checkElement(driver, "id", "5eb6eaf87637800730cec57f");
+		row.get(0).findElement(By.className("friendData")).click();
+		String mensaje = "MensajeTest29";
+		WebElement search = driver.findElement(By.id("newMessage"));
+		search.click();
+		search.clear();
+		search.sendKeys(mensaje);
+		WebElement sendButton = driver.findElement(By.id("addMessage"));
+		sendButton.click();
+		PO_View.checkElement(driver, "text", mensaje);	
+		driver.navigate().to(URL);
+		PO_HomeView.loginApiForm(driver, "alejan1579@gmail.com", "123");
+		row = PO_View.checkElement(driver, "id", "5eb58934a546330b2c522761");
+		assertTrue(row.get(0).findElement(By.className("friendDataCount")).getAttribute("innerHTML").equals("1"));
+		row.get(0).findElement(By.className("friendData")).click();
+		List<WebElement> messages = PO_View.checkElement(driver, "class", "messageRow");
+		for (WebElement message : messages) {
+			if (message.findElement(By.className("messageText")).getAttribute("innerHTML").equals(texto)) {
+				assertTrue(message.findElement(By.className("messageRead")).getAttribute("innerHTML").equals("leído"));
+				return;
+			}
+		}
+
 	}
 
 	// [Prueba30] Identificarse en la aplicación y enviar tres mensajes a un amigo,
@@ -516,10 +545,42 @@ public class SocianNetworkTest {
 		assertTrue("PR30 sin hacer", false);
 	}
 
-	// PR031. Sin hacer /
+	// PR031. Identificarse con un usuario A que al menos tenga 3 amigos, ir al chat
+	// del ultimo amigo de
+	// la lista y enviarle un mensaje, volver a la lista de amigos y comprobar que
+	// el usuario al que se le ha enviado
+	// el mensaje esta en primera posición.
+	// Identificarse con el usuario B y
+	// enviarle un mensaje al usuario A.
+	// Volver a identificarse con el usuario A y ver que el usuario que acaba de
+	// mandarle el mensaje es el primero
+	// en su lista de amigos.
 	@Test
 	public void PR31() {
-		assertTrue("PR31 sin hacer", false);
+		// Identificarse con un usuario A que al menos tenga 3 amigos
+		PO_HomeView.loginApiForm(driver, "alejan1579@gmail.com", "123");
+		// ir al chat del ultimo amigo de la lista
+		String lastEmail = PO_HomeView.lastApiFriend(driver);
+		// y enviarle un mensaje
+		PO_HomeView.sendApiMessage(driver,"MensajeTest31_1");
+		// volver a la lista de amigos
+		driver.navigate().to(URL);
+		PO_HomeView.loginApiForm(driver, "alejan1579@gmail.com", "123");
+		// comprobar que el usuario al que se le ha enviado el mensaje esta en primera posición
+		String firstEmail = PO_HomeView.firstApiEmail(driver);
+		assertTrue(lastEmail.equals(firstEmail));
+		//Identificarse con el usuario B
+		driver.navigate().to(URL);
+		PO_HomeView.loginApiForm(driver, lastEmail, "123");
+		// enviarle un mensaje al usuario A.
+		PO_HomeView.gotoApiEmail(driver,"alejan1579@gmail.com");
+		PO_HomeView.sendApiMessage(driver,"MensajeTest31_2");
+		//Volver a identificarse con el usuario A
+		driver.navigate().to(URL);
+		PO_HomeView.loginApiForm(driver, "alejan1579@gmail.com", "123");
+		//ver que el usuario que acaba de mandarle el mensaje es el primero en su lista de amigos.
+		firstEmail = PO_HomeView.firstApiEmail(driver);
+		assertTrue(firstEmail.equals(lastEmail));
 	}
 
 }
