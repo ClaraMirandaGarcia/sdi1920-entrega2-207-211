@@ -6,6 +6,8 @@ module.exports = function (app, swig, gestorBD) {
 
             let userSession = gestorBD.mongo.ObjectID(req.session.usuario._id.toString());
 
+            let userSessionId = req.session.usuario._id.toString();
+
             let criterioFrom = {
                 userFrom: userSession
             }
@@ -15,6 +17,7 @@ module.exports = function (app, swig, gestorBD) {
             let criterioFriend = {
                 $or: [criterioFrom, criterioTo]
             }
+
 
             let pg = parseInt(req.query.pg);
             if (req.query.pg == null) {
@@ -26,23 +29,40 @@ module.exports = function (app, swig, gestorBD) {
                     //TODO
                     res.send("Error al listar ");
                 } else {
-                    //check user
-                    let criterio = {
-                        $or: friendships.map((f) => {
-                            return {_id: gestorBD.mongo.ObjectID(f.userFrom.toString())}
-                        })
-                    }
+
 
                     if (friendships.length == 0) {
+
                         let users = [];
                         manageFriendships(users, total, pg, req, res);
 
                     } else {
+                        //tenemos las amistades
+
+                        //criterio -> pillar todos userTo && userFrom
+                        let criterioArray = []
+
+                        //para cada amistad ->
+                        for(let i = 0; i<friendships.length; i++){
+                            criterioArray.push({_id: gestorBD.mongo.ObjectID(friendships[i].userFrom.toString())});
+                            criterioArray.push({_id: gestorBD.mongo.ObjectID(friendships[i].userTo.toString())});
+                        }
+
+
+                        let final = criterioArray.filter(
+                            (c) =>
+                                c._id.toString() !== userSessionId
+                        );
+
+                        let criterio = {
+                            $or: final
+                        }
+
                         gestorBD.getUsers(criterio, function (users) {
                             if (users == null) {
                                 //TODO
                                 //ERROR
-                                res.redirect("/usuarios" +
+                                res.redirect("/users" +
                                     "?message=Error interno" +
                                     "&messageType=alert-warning ");
                             } else {
@@ -51,9 +71,10 @@ module.exports = function (app, swig, gestorBD) {
 
 
                                 //list users name, surname, email
+
                                 let final = users.filter(
                                     (user) =>
-                                        user._id !== userSession
+                                        user._id.toString() !== userSessionId
                                 );
                                 manageFriendships(final, total, pg, req, res)
                             }
