@@ -34,9 +34,9 @@ import com.uniovi.tests.util.SeleniumUtils;
 public class SocianNetworkTest {
 
 	static String PathFirefox65 = "C:\\Program Files\\Mozilla Firefox\\firefox.exe";
-	//static String Geckdriver024 = "C:\\Users\\CMG\\Desktop\\Tercero\\2_Cuatrimestre\\SDI\\Laboratorio\\Material\\PL-SDI-Sesión5-material\\PL-SDI-Sesión5-material\\geckodriver024win64.exe";
-	static String Geckdriver024 =
-	 "C:\\Users\\AGM-PC\\Documents\\GitHub\\SDI\\PL-SDI-Sesión5-material\\geckodriver024win64.exe";
+	static String Geckdriver024 = "C:\\Users\\CMG\\Desktop\\Tercero\\2_Cuatrimestre\\SDI\\Laboratorio\\Material\\PL-SDI-Sesión5-material\\PL-SDI-Sesión5-material\\geckodriver024win64.exe";
+//	static String Geckdriver024 =
+//	 "C:\\Users\\AGM-PC\\Documents\\GitHub\\SDI\\PL-SDI-Sesión5-material\\geckodriver024win64.exe";
 	static WebDriver driver = getDriver(PathFirefox65, Geckdriver024);
 	static String URL = "https://localhost:8081";
 
@@ -466,14 +466,35 @@ public class SocianNetworkTest {
 		assertEquals(1, PO_PrivateView.countInPagination(driver, "tableFriendship"));
 	}
 
-	// PR27. Acceder a la lista de mensajes de un amigo “chat”, la lista debe contener al menos tres mensajes.
+	// PR27. Acceder a la lista de mensajes de un amigo “chat”, la lista debe
+	// contener al menos tres mensajes.
 	@Test
 	public void PR27() {
-		PO_HomeView.loginApiForm(driver,"alejan1579@gmail.com","123");
+		PO_HomeView.loginApiForm(driver, "alejan1579@gmail.com", "123");
 		List<WebElement> row = PO_View.checkElement(driver, "id", "5eb58934a546330b2c522761");
 		row.get(0).findElement(By.className("friendData")).click();
-		List<WebElement> messages =  PO_View.checkElement(driver, "class", "messageRow");
-		assertTrue(messages.size() >=3);
+		List<WebElement> messages = PO_View.checkElement(driver, "class", "messageRow");
+		assertTrue(messages.size() >= 3);
+	}
+
+	// [Prueba28] Acceder a la lista de mensajes de un amigo “chat” y crear un nuevo
+	// mensaje, validar que el mensaje aparece en la lista de mensajes.
+	@Test
+	public void PR28() {
+		PO_HomeView.clickOption(driver, "cliente.html");
+		PO_View.checkElement(driver, "id", "widget-login");
+		PO_LoginView.fillFormApi(driver, "tengo3amigos@gmail.com", "tengo3amigos");
+		PO_View.checkElement(driver, "text", "Tus amigos");
+		
+		//enviar mensaje a -> prueba2@prueba2.com
+		List<WebElement> users = SeleniumUtils.EsperaCargaPaginaxpath(driver, " /html/body/div[2]/div/div/div[1]/div/table/tbody/tr/td[1]", 3);
+		users.get(0).click();
+		
+		String text = "MensajeTest28";
+		PO_Client_ChatView.fillForm(driver, text);
+		
+		SeleniumUtils.esperarSegundos(driver, 2);
+		SeleniumUtils.textoPresentePagina(driver, text);
 	}
 
 	// PR029. Sin hacer /
@@ -482,7 +503,11 @@ public class SocianNetworkTest {
 		assertTrue("PR29 sin hacer", false);
 	}
 
-	// PR030. Sin hacer /
+	// [Prueba30] Identificarse en la aplicación y enviar tres mensajes a un amigo,
+	// validar que los mensajes enviados aparecen en el chat. Identificarse después
+	// con el usuario que recibido el mensaje y validar que el número de mensajes
+	// sin leer aparece en la propia lista de amigos
+	
 	@Test
 	public void PR30() {
 		assertTrue("PR30 sin hacer", false);
