@@ -498,6 +498,9 @@ public class SocianNetworkTest {
 		sendButton.click();
 		PO_View.checkElement(driver, "text", mensaje);	
 		
+		
+		//delete message
+		
 	}
 
 	// PR029. Sin hacer /

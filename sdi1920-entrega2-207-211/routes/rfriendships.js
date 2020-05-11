@@ -58,8 +58,7 @@ module.exports = function (app, swig, gestorBD) {
 
                         gestorBD.getUsers(criterio, function (users) {
                             if (users == null) {
-                                //TODO
-                                //ERROR
+
                                 res.redirect("/users" +
                                     "?message=Error interno" +
                                     "&messageType=alert-warning ");

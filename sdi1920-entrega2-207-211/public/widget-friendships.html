@@ -28,6 +28,7 @@
 
     var friendships;
     var frUnreadMessages;
+    var intervalUnreadMessages = null;
 
     function loadFriendships() {
         $.ajax({
@@ -38,9 +39,9 @@
             headers: {"token": token},
 
             success: function (respuesta) {
-                friendships = JSON.parse(respuesta);
-                unreadMessages();
-                //actualizarTabla(friendships);
+                friendships = respuesta;
+                unreadMessagesLoad();
+                //unreadMessages();
 
             },
             error: function (error) {
@@ -50,15 +51,27 @@
         });
     }
 
+    function unreadMessagesLoad() {
+
+        unreadMessages();
+        if (intervalUnreadMessages) {
+            clearInterval(intervalUnreadMessages);
+        }
+
+        intervalUnreadMessages = setInterval(() => unreadMessages(), 2000);
+
+    }
+
     function unreadMessages() {
         frUnreadMessages = [];
         //iterate
-        for (let i = 0; i < friendships.length; i++) {
+        let friendshipsIterate = JSON.parse(friendships);
+        for (let i = 0; i < friendshipsIterate.length; i++) {
             $.ajax({
                 url: URLbase + "/message/unread",
                 type: "POST",
                 data: {
-                    friend: friendships[i]
+                    friend: friendshipsIterate[i]
                 },
                 dataType: 'json',
                 headers: {"token": token},
@@ -102,14 +115,14 @@
         var friendsResult = [];
         var filter = $("#name-filter").val();
 
-        let jsonFormat = friendships;
+        let jsonFormat = JSON.parse(friendships);
         for (i = 0; i < jsonFormat.length; i++) {
 
             if (jsonFormat[i].name.indexOf(filter) != -1) {
                 friendsResult.push(jsonFormat[i]);
             }
         }
-        actualizarTabla(friendsResult);
+        actualizarTabla(JSON.stringify(friendsResult));
     });
 
 

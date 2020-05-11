@@ -38,12 +38,18 @@
         });
     }
     getConversacion();
+
     function actualizarTabla(mensajes) {
+        console.log('ÑÑÑÑÑÑÑÑÑÑÑÑÑÑÑÑÑÑÑÑÑÑÑÑÑÑÑÑÑÑ')
+        console.log(mensajes);
+
         $("#tablaCuerpo").empty(); // Vaciar la tabla
         for (i = 0; i < mensajes.length; i++) {
             if (mensajes[i].destino !== emailObjetivo){
                 mensajes[i].leido = true;
+                console.log(mensajes[i]._id);
                 markRead(mensajes[i]._id)
+
             }
             let read  = mensajes[i].leido ? "leído": "no leido";
             $("#tablaCuerpo")

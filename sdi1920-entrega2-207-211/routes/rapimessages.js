@@ -11,8 +11,6 @@ module.exports = function (app, gestorBD) {
             destino: res.usuario,
             leido: false
         }
-        console.log(criteria);
-        console.log(friend);
 
         gestorBD.obtainNonreadMessages(criteria, function(messagesNum){
             //return a friend
@@ -20,7 +18,6 @@ module.exports = function (app, gestorBD) {
             res.status(200);
             friend.numNonReadMessages = messagesNum;
             res.json(JSON.stringify(friend));
-            console.log(friend);
         });
         //criteria
     });
@@ -48,11 +45,19 @@ module.exports = function (app, gestorBD) {
 
     function checkReceptor(criterio, usuario, callback) {
         gestorBD.obtainMessage(criterio, function (messages) {
-            if (usuario && messages[0].destino === usuario) {
-                callback(null)
-            } else {
-                callback("No tiene permisos para acceder a ese mensaje")
-            }
+            console.log('AAAAAAAAA');
+            console.log(criterio);
+            console.log(messages);
+            //if(messages.length !== 0){
+                if (usuario && messages[0].destino === usuario) {
+                    callback(null)
+                } else {
+                    callback("No tiene permisos para acceder a ese mensaje")
+                }
+            //} else {
+            //    callback(null)
+            //}
+
         })
     }
 
@@ -153,7 +158,10 @@ module.exports = function (app, gestorBD) {
 
         gestorBD.getUsers(criterio, function (users, total) {
             if (users == null) {
-                console.log('NULL');
+                res.status(500);
+                res.json({
+                    error: "Error al obtener esos usuarios "
+                });
 
             } else {
 
