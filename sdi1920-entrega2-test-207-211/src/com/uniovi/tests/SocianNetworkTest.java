@@ -466,10 +466,14 @@ public class SocianNetworkTest {
 		assertEquals(1, PO_PrivateView.countInPagination(driver, "tableFriendship"));
 	}
 
-	// PR27. Sin hacer /
+	// PR27. Acceder a la lista de mensajes de un amigo “chat”, la lista debe contener al menos tres mensajes.
 	@Test
 	public void PR27() {
-		assertTrue("PR27 sin hacer", false);
+		PO_HomeView.loginApiForm(driver,"alejan1579@gmail.com","123");
+		List<WebElement> row = PO_View.checkElement(driver, "id", "5eb58934a546330b2c522761");
+		row.get(0).findElement(By.className("friendData")).click();
+		List<WebElement> messages =  PO_View.checkElement(driver, "class", "messageRow");
+		assertTrue(messages.size() >=3);
 	}
 
 	// PR029. Sin hacer /
