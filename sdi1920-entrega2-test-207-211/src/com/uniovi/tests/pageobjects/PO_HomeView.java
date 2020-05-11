@@ -32,5 +32,11 @@ public class PO_HomeView extends PO_NavView {
 		PO_View.checkElement(driver, "text", emailp);
 	}
 
+	public static void loginApiForm(WebDriver driver, String email, String user) {
+		PO_HomeView.clickOption(driver, "cliente.html","id","boton-login");
+		PO_LoginView.fillFormApi(driver, email, user);
+		
+	}
+
 
 }
