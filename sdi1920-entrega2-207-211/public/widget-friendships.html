@@ -12,11 +12,12 @@
             <th>Nombre</th>
             <th>Apellido</th>
             <th>Email</th>
+            <th>Sin leer</th>
             <th class="col-md-1"></th>
         </tr>
         </thead>
 
-        <tbody id="tablaCuerpo">
+        <tbody id="tablaCuerpoAmigos">
         </tbody>
 
     </table>
@@ -26,6 +27,8 @@
     window.history.pushState("", "", "/cliente.html?w=friendships");
 
     var friendships;
+    var frUnreadMessages;
+    var unreadInterval;
 
     function loadFriendships() {
         $.ajax({
@@ -36,8 +39,10 @@
             headers: {"token": token},
 
             success: function (respuesta) {
-                friendships = respuesta;
-                actualizarTabla(friendships);
+                friendships = JSON.parse(respuesta);
+                actualizarAutomaticamente();
+                //unreadMessages();
+
             },
             error: function (error) {
                 console.log(error);
@@ -46,17 +51,59 @@
         });
     }
 
-    function actualizarTabla(amigosMostrar) {
-        $("#tablaCuerpo").empty(); // Vaciar la tabla
+    function actualizarAutomaticamente(){
+        unreadMessages();
+        if (unreadInterval) {
+            clearInterval(unreadInterval);
+        }
+        unreadInterval = setInterval(() => unreadMessages(), 2000);
+    }
 
-        let friendships = JSON.parse(amigosMostrar);
+    function unreadMessages() {
+        frUnreadMessages = [];
+        //iterate
+        for (let i = 0; i < friendships.length; i++) {
+            $.ajax({
+                url: URLbase + "/message/unread",
+                type: "POST",
+                data: {
+                    friend: friendships[i]
+                },
+                dataType: 'json',
+                headers: {"token": token},
+
+                success: function (respuesta) {
+                    frUnreadMessages.push(JSON.parse(respuesta));
+                    //viene de aquí
+
+                    actualizarTablaFriendship(frUnreadMessages);
+                },
+                error: function (error) {
+                    console.log(error);
+                    $("#contenedor-principal").load("widget-login.html");
+                }
+            });
+        }
+
+    }
+
+    function actualizarTablaFriendship(friendships) {
+        $("#tablaCuerpoAmigos").empty(); // Vaciar la tabla
+
+        //let friendships = JSON.parse(amigosMostrar);
+        let numMessages;
 
         for (i = 0; i < friendships.length; i++) {
-            $("#tablaCuerpo")
-                .append("<tr id=" + friendships[i]._id + ">" +
-                    "<td>" + friendships[i].name + "</td>" +
-                    "<td>" + friendships[i].surname + "</td>" +
-                    "<td>" + friendships[i].email + "</td>" +
+            console.log(friendships);
+
+            numMessages = friendships[i].numNonReadMessages || "0";
+
+            $("#tablaCuerpoAmigos")
+                .append("<tr onclick=conversacion('" + friendships[i].email + "') id=" + friendships[i]._id + ">" +
+                    "<td class='friendData'>" + friendships[i].name + "</td>" +
+                    "<td class='friendData'>" + friendships[i].surname + "</td>" +
+                    "<td class='friendData'>" + friendships[i].email + "</td>" +
+                    "<td class='friendDataCount'>" + friendships[i].numNonReadMessages + "</td>" +
                     +"</tr>"
                 );
         }
@@ -64,18 +111,18 @@
 
     loadFriendships();
 
-    $('#name-filter').on('input',function(e){
+    $('#name-filter').on('input', function (e) {
         var friendsResult = [];
         var filter = $("#name-filter").val();
 
-        let jsonFormat = JSON.parse(friendships);
+        let jsonFormat = friendships;
         for (i = 0; i < jsonFormat.length; i++) {
 
-            if (jsonFormat[i].name.indexOf(filter) != -1 ){
+            if (jsonFormat[i].name.indexOf(filter) != -1) {
                 friendsResult.push(jsonFormat[i]);
             }
         }
-        actualizarTabla(JSON.stringify(friendsResult));
+        actualizarTablaFriendship(friendsResult);
     });
 
 

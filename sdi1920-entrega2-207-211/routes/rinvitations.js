@@ -185,7 +185,8 @@ module.exports = function (app, swig, gestorBD) {
                     // insert friendship
                     let friendship = {
                         userFrom: userFrom,
-                        userTo: userTo
+                        userTo: userTo,
+                        dateUpdate: new Date(2000,1,1,0,0,1)
                     }
                     gestorBD.insertFriendship(friendship, function (id) {
                         if (id == null) {

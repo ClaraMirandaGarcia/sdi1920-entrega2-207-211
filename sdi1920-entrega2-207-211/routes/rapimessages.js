@@ -1,12 +1,36 @@
 module.exports = function (app, gestorBD) {
 
+    ///message/unread"
+    app.post("/api/message/unread", function (req, res) {
+        //get friend
+        let friend = req.body.friend;
+
+        //criteria
+        let criteria = {
+            emisor: friend.email,
+            destino: res.usuario,
+            leido: false
+        }
+        console.log(criteria);
+        console.log(friend);
+
+        gestorBD.obtainNonreadMessages(criteria, function(messagesNum){
+            //return a friend
+
+            res.status(200);
+            friend.numNonReadMessages = messagesNum;
+            res.json(JSON.stringify(friend));
+            console.log(friend);
+        });
+        //criteria
+    });
     app.post("/api/conversation", function (req, res) {
         let users = {
             $or: [{
                 emisor: req.body.u1,
-                destino: req.body.u2
+                destino: res.usuario
             }, {
-                emisor: req.body.u2,
+                emisor: res.usuario,
                 destino: req.body.u1
             }]
         };
@@ -23,8 +47,6 @@ module.exports = function (app, gestorBD) {
 
     function checkReceptor(criterio, usuario, callback) {
         gestorBD.obtainMessage(criterio, function (messages) {
-            console.log(messages[0].destino)
-            console.log(usuario)
             if (usuario && messages[0].destino === usuario) {
                 callback(null)
             } else {
@@ -32,11 +54,12 @@ module.exports = function (app, gestorBD) {
             }
         })
     }
-    app.put("/api/message/markRead/:id", function (req, res ) {
+
+    app.put("/api/message/markRead/:id", function (req, res) {
         let criterio = {"_id": gestorBD.mongo.ObjectID(req.params.id)};
-        checkReceptor(criterio,res.usuario, function (errorMessage) {
-            if (errorMessage == null){
-                gestorBD.markRead(criterio,function (result) {
+        checkReceptor(criterio, res.usuario, function (errorMessage) {
+            if (errorMessage == null) {
+                gestorBD.markRead(criterio, function (result) {
                     if (result == null) {
                         res.status(500);
                         res.json({
@@ -50,7 +73,7 @@ module.exports = function (app, gestorBD) {
                         })
                     }
                 })
-            }else {
+            } else {
                 res.status(500);
                 res.json({
                     error: errorMessage
@@ -58,14 +81,15 @@ module.exports = function (app, gestorBD) {
             }
         })
     });
-    app.post("/api/message/send", function (req, res) {
 
+
+    app.post("/api/message/send", function (req, res) {
         let criterioEmisor = {
-            email: res.usuario.email
+            email: res.usuario
         }
 
         let criterioSender = {
-            email: res.body.destino
+            email: req.body.destino
         }
 
         let criterioUsers = {
@@ -74,69 +98,49 @@ module.exports = function (app, gestorBD) {
 
         gestorBD.getUsers(criterioUsers, function (users, total) {
             if (users == null || users.length < 2) {
+
                 res.status(500);
                 res.json({
                     error: "Error al obtener los usuarios del mensaje "
                 });
             } else {
-
                 //both users were found
-                let user1 = users[0];
-                let user2 = users[1];
 
-                let user1Id = gestorBD.mongo.ObjectID(user1._id.toString());
-                let user2Id = gestorBD.mongo.ObjectID(user2._id.toString());
-
-                //check if they're friends by their ids
-                let criterioFrom = {
-                    userFrom: user1Id,
-                    userTo: user2Id
+                //create the message
+                let message = {
+                    emisor: res.usuario, // -> BY EMAIL
+                    destino: req.body.destino, // -> BY EMAIL
+                    texto: req.body.texto,
+                    leido: false,
                 }
 
-                let criterioTo = {
-                    userFrom: user2Id,
-                    userTo: user1Id
-                }
+                //insert the message
+                gestorBD.insertMessage(message, (id) => {
+                    if (id) {
+                        let criterio = {
+                            $or: [{
+                                userFrom: gestorBD.mongo.ObjectID(users[0]._id),
+                                userTo: gestorBD.mongo.ObjectID(users[1]._id)
+                            }, {
+                                userFrom: gestorBD.mongo.ObjectID(users[1]._id),
+                                userTo: gestorBD.mongo.ObjectID(users[0]._id)
+                            }]
+                        };
+                        gestorBD.updateDate(criterio, function (result) {
 
-                let criterioFriend = {
-                    $or: [criterioFrom, criterioTo]
-                }
-
-                gestorBD.obtainFriendships(criterioFriend, function (friendships) {
-                    if (friendships == null || friendships.length < 1) {
-                        //they are not friends
-                        res.status(500);
+                        });
+                        res.status(200);
                         res.json({
-                            error: "No eres amigo de ese usuario"
+                            mensaje: "Enviado correctamente",
+                            _id: id
                         });
                     } else {
-                        //they are friends
-
-                        //create the message
-                        let message = {
-                            emisor: res.usuario.email, // -> BY EMAIL
-                            destino: req.body.destino, // -> BY EMAIL
-                            texto: req.body.texto,
-                            leido: false,
-                        }
-
-                        //insert the message
-                        gestorBD.insertMessage(message, (id) => {
-                            if (id) {
-                                res.status(200);
-                                res.json({
-                                    mensaje: "Enviado correctamente",
-                                    _id: id
-                                });
-                            } else {
-                                res.status(500);
-                                res.json({
-                                    error: "Error: no se pudo mandar el mensaje"
-                                });
-                            }
+                        res.status(500);
+                        res.json({
+                            error: "Error: no se pudo mandar el mensaje"
                         });
                     }
-                })
+                });
             }
         });
 
@@ -153,6 +157,7 @@ module.exports = function (app, gestorBD) {
             } else {
 
                 let userSessionCompl = users[0];
+                let userSessionId = userSessionCompl._id.toString();
                 let userSession = gestorBD.mongo.ObjectID(userSessionCompl._id.toString());
 
 
@@ -175,21 +180,31 @@ module.exports = function (app, gestorBD) {
                         });
                     } else {
 
-                        if(friendships.length == 0){
+                        if (friendships.length == 0) {
                             let users = [];
 
                             res.status(200);
                             res.json(JSON.stringify(users));
 
-                        } else{
+                        } else {
 
                             //check user
-                            let criterio = {
-                                $or: friendships.map((f) => {
-                                    return {_id: gestorBD.mongo.ObjectID(f.userFrom.toString())}
-                                })
+                            //criterio -> pillar todos userTo && userFrom
+                            let criterioArray = []
+                            let sorted = friendships.sort((a, b) => b.dateUpdate - a.dateUpdate);
+                            //para cada amistad ->
+                            for (let i = 0; i < friendships.length; i++) {
+                                criterioArray.push({_id: gestorBD.mongo.ObjectID(friendships[i].userFrom.toString())});
+                                criterioArray.push({_id: gestorBD.mongo.ObjectID(friendships[i].userTo.toString())});
                             }
+                            let final = criterioArray.filter(
+                                (c) =>
+                                    c._id.toString() !== userSessionId
+                            );
 
+                            let criterio = {
+                                $or: final
+                            }
                             gestorBD.getUsers(criterio, (users) => {
 
                                 if (users == null) {
@@ -200,9 +215,30 @@ module.exports = function (app, gestorBD) {
                                     });
                                 } else {
 
+                                    let usersAux = [];
+                                    //eliminar de users al usuario en sesión
+                                    let sortedUsers = [];
+                                    sorted.forEach(function (key) {
+                                        let found = false;
+                                        users = users.filter(function (user) {
+                                            if (!found && (user._id.toString() === key.userFrom.toString() || user._id.toString() === key.userTo.toString())){
+                                                sortedUsers.push(user);
+                                                found = true;
+                                                return false;
+                                            } else
+                                                return true;
+                                        })
 
+                                    })
+                                    for (let i = 0; i < sortedUsers.length; i++) {
+                                        let userSpecific = sortedUsers[i]._id.toString();
+
+                                        if (userSpecific != userSessionId) {
+                                            usersAux.push(sortedUsers[i]);
+                                        }
+                                    }
                                     res.status(200);
-                                    res.json(JSON.stringify(users));
+                                    res.json(JSON.stringify(usersAux));
                                 }
                             });
 

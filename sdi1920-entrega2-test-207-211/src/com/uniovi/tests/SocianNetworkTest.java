@@ -19,6 +19,7 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.firefox.FirefoxDriver;
 
+import com.uniovi.tests.pageobjects.PO_ChatView;
 //Paquetes con los Page Object
 import com.uniovi.tests.pageobjects.PO_HomeView;
 import com.uniovi.tests.pageobjects.PO_LoginView;
@@ -34,9 +35,9 @@ import com.uniovi.tests.util.SeleniumUtils;
 public class SocianNetworkTest {
 
 	static String PathFirefox65 = "C:\\Program Files\\Mozilla Firefox\\firefox.exe";
-	static String Geckdriver024 = "C:\\Users\\CMG\\Desktop\\Tercero\\2_Cuatrimestre\\SDI\\Laboratorio\\Material\\PL-SDI-Sesión5-material\\PL-SDI-Sesión5-material\\geckodriver024win64.exe";
 	// static String Geckdriver024 =
-	// "C:\\Users\\AGM-PC\\Documents\\GitHub\\SDI\\PL-SDI-Sesión5-material\\geckodriver024win64.exe";
+	// "C:\\Users\\CMG\\Desktop\\Tercero\\2_Cuatrimestre\\SDI\\Laboratorio\\Material\\PL-SDI-Sesión5-material\\PL-SDI-Sesión5-material\\geckodriver024win64.exe";
+	static String Geckdriver024 = "C:\\Users\\AGM-PC\\Documents\\GitHub\\SDI\\PL-SDI-Sesión5-material\\geckodriver024win64.exe";
 	static WebDriver driver = getDriver(PathFirefox65, Geckdriver024);
 	static String URL = "https://localhost:8081";
 
@@ -378,22 +379,32 @@ public class SocianNetworkTest {
 
 	}
 
-	// P20. Sin hacer /
+	// P20. Intentar acceder sin estar autenticado a la opción de listado de
+	// usuarios. Se deberá volver al formulario de login.
 	@Test
 	public void PR20() {
-		assertTrue("PR20 sin hacer", false);
+		driver.get("https://localhost:8081/users");
+		PO_View.checkElement(driver, "id", "loginButton");
 	}
 
-	// PR21. Sin hacer /
+	// PR21. Intentar acceder sin estar autenticado a la opción de listado de
+	// invitaciones de amistad recibida de un usuario estándar. Se deberá volver al
+	// formulario de login
 	@Test
 	public void PR21() {
-		assertTrue("PR21 sin hacer", false);
+		driver.get("https://localhost:8081/invitations");
+		PO_View.checkElement(driver, "id", "loginButton");
 	}
 
-	// PR22. Sin hacer /
+	// PR22. Intentar acceder estando autenticado como usuario standard a la lista
+	// de amigos de otro usuario. Se deberá mostrar un mensaje de acción indebida.
 	@Test
 	public void PR22() {
-		assertTrue("PR22 sin hacer", false);
+		// Para acceder a la lista de amigos en nuestra aplicación se debe acceder a
+		// /friendships, sin parametros. Debido a esto por diseño es imposible ver la
+		// lista de amigos de otro usuario, pues la aplicación utiliza el usuario en
+		// sesión para obtenerla
+		assertTrue("PR22 no aplica", true);
 	}
 
 	// [Prueba23] Inicio de sesión con datos válidos.
@@ -435,7 +446,7 @@ public class SocianNetworkTest {
 //	[Prueba26] Acceder a la lista de amigos de un usuario, 
 //	y realizar un filtrado para encontrar a un amigo concreto, 
 //	el nombre a buscar debe coincidir con el de un amigo
-	
+
 	@Test
 	public void PR26() {
 		PO_HomeView.clickOption(driver, "cliente.html");
@@ -443,42 +454,152 @@ public class SocianNetworkTest {
 		PO_LoginView.fillFormApi(driver, "tengo3amigos@gmail.com", "tengo3amigos");
 		PO_View.checkElement(driver, "text", "Tus amigos");
 		SeleniumUtils.esperarSegundos(driver, 5);
-		
-		//search for prueba2
-		//name-filter
-		//refreshButton
+
+		// search for prueba2
+		// name-filter
+		// refreshButton
 		WebElement search = driver.findElement(By.id("name-filter"));
 		search.click();
 		search.clear();
 		search.sendKeys("prueba2");
-		
-		
+
 		SeleniumUtils.esperarSegundos(driver, 5);
 		assertEquals(1, PO_PrivateView.countInPagination(driver, "tableFriendship"));
 	}
 
-	// PR27. Sin hacer /
+	// PR27. Acceder a la lista de mensajes de un amigo “chat”, la lista debe
+	// contener al menos tres mensajes.
 	@Test
 	public void PR27() {
-		assertTrue("PR27 sin hacer", false);
+		PO_HomeView.loginApiForm(driver, "alejan1579@gmail.com", "123");
+		List<WebElement> row = PO_View.checkElement(driver, "id", "5eb58934a546330b2c522761");
+		row.get(0).findElement(By.className("friendData")).click();
+		List<WebElement> messages = PO_View.checkElement(driver, "class", "messageRow");
+		assertTrue(messages.size() >= 3);
 	}
 
-	// PR029. Sin hacer /
+	// [Prueba28] Acceder a la lista de mensajes de un amigo “chat” y crear un nuevo
+	// mensaje, validar que el mensaje aparece en la lista de mensajes.
+	@Test
+	public void PR28() {
+		PO_HomeView.loginApiForm(driver, "tengo3amigos@gmail.com", "tengo3amigos");
+		
+		//id -> prueba2 = 5eb8193dbb06acf8338e9150
+		List<WebElement> row = PO_View.checkElement(driver, "id", "5eb8193dbb06acf8338e9150");
+		row.get(0).findElement(By.className("friendData")).click();
+		
+		//crear && enviar mensaje
+		String mensaje = "MensajeTest28";
+		PO_ChatView.createSendMessage(mensaje, driver);	
+		
+	}
+
+	// PR029. Identificarse en la aplicación y enviar un mensaje a un amigo, validar
+	// que el mensaje enviado
+	// aparece en el chat. Identificarse después con el usuario que recibido el
+	// mensaje y validar que tiene un
+	// mensaje sin leer, entrar en el chat y comprobar que el mensaje pasa a tener
+	// el estado leído.
 	@Test
 	public void PR29() {
-		assertTrue("PR29 sin hacer", false);
+		String texto = "asdsad";
+		PO_HomeView.loginApiForm(driver, "prueba1@prueba1.com", "123");
+		List<WebElement> row = PO_View.checkElement(driver, "id", "5eb6eaf87637800730cec57f");
+		row.get(0).findElement(By.className("friendData")).click();
+		String mensaje = "MensajeTest29";
+		WebElement search = driver.findElement(By.id("newMessage"));
+		search.click();
+		search.clear();
+		search.sendKeys(mensaje);
+		WebElement sendButton = driver.findElement(By.id("addMessage"));
+		sendButton.click();
+		PO_View.checkElement(driver, "text", mensaje);	
+		driver.navigate().to(URL);
+		PO_HomeView.loginApiForm(driver, "alejan1579@gmail.com", "123");
+		row = PO_View.checkElement(driver, "id", "5eb58934a546330b2c522761");
+		assertTrue(row.get(0).findElement(By.className("friendDataCount")).getAttribute("innerHTML").equals("1"));
+		row.get(0).findElement(By.className("friendData")).click();
+		List<WebElement> messages = PO_View.checkElement(driver, "class", "messageRow");
+		for (WebElement message : messages) {
+			if (message.findElement(By.className("messageText")).getAttribute("innerHTML").equals(texto)) {
+				assertTrue(message.findElement(By.className("messageRead")).getAttribute("innerHTML").equals("leído"));
+				return;
+			}
+		}
+
 	}
 
-	// PR030. Sin hacer /
+	// [Prueba30] Identificarse en la aplicación y enviar tres mensajes a un amigo,
+	// validar que los mensajes enviados aparecen en el chat. Identificarse después
+	// con el usuario que recibido el mensaje y validar que el número de mensajes
+	// sin leer aparece en la propia lista de amigos
+	
 	@Test
 	public void PR30() {
-		assertTrue("PR30 sin hacer", false);
+		//asdf no tiene más amigos
+		PO_HomeView.loginApiForm(driver, "tengo3amigos@gmail.com", "tengo3amigos");
+		
+		//id -> asdf = 5eb58d1df805e44eda6da88d
+		List<WebElement> row = PO_View.checkElement(driver, "id", "5eb58d1df805e44eda6da88d");
+		row.get(0).findElement(By.className("friendData")).click();
+		
+		//crear && enviar mensaje
+		String mensaje01 = "MensajeTest30_01";
+		PO_ChatView.createSendMessage(mensaje01, driver);	
+		String mensaje02 = "MensajeTest30_02";
+		PO_ChatView.createSendMessage(mensaje02, driver);	
+		String mensaje03 = "MensajeTest30_03";
+		PO_ChatView.createSendMessage(mensaje03, driver);	
+		
+		//Botón volver
+		WebElement returnButton = driver.findElement(By.id("volverApp"));
+		returnButton.click();
+		//Iniciar sesión
+		PO_HomeView.loginApiForm(driver, "asdf@gmail.com", "asdf");
+		//chat -> tengo3amigos@gmail.com. 5eb92576209b0415355b6270
+		
+		
+		//check 3 unread messages en la lista de amigos
+		PO_View.checkElement(driver, "text", "3");
+		
 	}
 
-	// PR031. Sin hacer /
+	// PR031. Identificarse con un usuario A que al menos tenga 3 amigos, ir al chat
+	// del ultimo amigo de
+	// la lista y enviarle un mensaje, volver a la lista de amigos y comprobar que
+	// el usuario al que se le ha enviado
+	// el mensaje esta en primera posición.
+	// Identificarse con el usuario B y
+	// enviarle un mensaje al usuario A.
+	// Volver a identificarse con el usuario A y ver que el usuario que acaba de
+	// mandarle el mensaje es el primero
+	// en su lista de amigos.
 	@Test
 	public void PR31() {
-		assertTrue("PR31 sin hacer", false);
+		// Identificarse con un usuario A que al menos tenga 3 amigos
+		PO_HomeView.loginApiForm(driver, "alejan1579@gmail.com", "123");
+		// ir al chat del ultimo amigo de la lista
+		String lastEmail = PO_HomeView.lastApiFriend(driver);
+		// y enviarle un mensaje
+		PO_HomeView.sendApiMessage(driver,"MensajeTest31_1");
+		// volver a la lista de amigos
+		driver.navigate().to(URL);
+		PO_HomeView.loginApiForm(driver, "alejan1579@gmail.com", "123");
+		// comprobar que el usuario al que se le ha enviado el mensaje esta en primera posición
+		String firstEmail = PO_HomeView.firstApiEmail(driver);
+		assertTrue(lastEmail.equals(firstEmail));
+		//Identificarse con el usuario B
+		driver.navigate().to(URL);
+		PO_HomeView.loginApiForm(driver, lastEmail, "123");
+		// enviarle un mensaje al usuario A.
+		PO_HomeView.gotoApiEmail(driver,"alejan1579@gmail.com");
+		PO_HomeView.sendApiMessage(driver,"MensajeTest31_2");
+		//Volver a identificarse con el usuario A
+		driver.navigate().to(URL);
+		PO_HomeView.loginApiForm(driver, "alejan1579@gmail.com", "123");
+		//ver que el usuario que acaba de mandarle el mensaje es el primero en su lista de amigos.
+		firstEmail = PO_HomeView.firstApiEmail(driver);
+		assertTrue(firstEmail.equals(lastEmail));
 	}
 
 }
