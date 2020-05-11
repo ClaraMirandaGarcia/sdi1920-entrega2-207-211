@@ -39,6 +39,7 @@
 
             success: function (respuesta) {
                 friendships = JSON.parse(respuesta);
+                console.log(friendships)
                 unreadMessages();
                 //actualizarTabla(friendships);
 
@@ -64,7 +65,8 @@
                 headers: {"token": token},
 
                 success: function (respuesta) {
-                    frUnreadMessages.push(JSON.parse(respuesta));
+                    frUnreadMessages[i] = (JSON.parse(respuesta));
+                    console.log(frUnreadMessages)
                     actualizarTabla(frUnreadMessages);
                 },
                 error: function (error) {
@@ -81,7 +83,6 @@
 
         //let friendships = JSON.parse(amigosMostrar);
         let numMessages;
-
         for (i = 0; i < friendships.length; i++) {
 
             numMessages = friendships[i].numNonReadMessages || "0";
