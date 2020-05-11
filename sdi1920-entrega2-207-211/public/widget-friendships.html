@@ -73,9 +73,7 @@
                 headers: {"token": token},
 
                 success: function (respuesta) {
-                    frUnreadMessages.push(JSON.parse(respuesta));
-                    //viene de aquí
-
+                    frUnreadMessages[i] = (JSON.parse(respuesta));
                     actualizarTablaFriendship(frUnreadMessages);
                 },
                 error: function (error) {
@@ -92,14 +90,12 @@
 
         //let friendships = JSON.parse(amigosMostrar);
         let numMessages;
-
         for (i = 0; i < friendships.length; i++) {
-            console.log(friendships);
 
             numMessages = friendships[i].numNonReadMessages || "0";
 
             $("#tablaCuerpoAmigos")
-                .append("<tr onclick=conversacion('" + friendships[i].email + "') id=" + friendships[i]._id + ">" +
+                .append("<tr class='friendRow' onclick=conversacion('" + friendships[i].email + "') id=" + friendships[i]._id + ">" +
                     "<td class='friendData'>" + friendships[i].name + "</td>" +
                     "<td class='friendData'>" + friendships[i].surname + "</td>" +
                     "<td class='friendData'>" + friendships[i].email + "</td>" +

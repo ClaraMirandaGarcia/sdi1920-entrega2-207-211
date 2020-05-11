@@ -11,8 +11,6 @@ module.exports = function (app, gestorBD) {
             destino: res.usuario,
             leido: false
         }
-        console.log(criteria);
-        console.log(friend);
 
         gestorBD.obtainNonreadMessages(criteria, function(messagesNum){
             //return a friend
@@ -20,7 +18,6 @@ module.exports = function (app, gestorBD) {
             res.status(200);
             friend.numNonReadMessages = messagesNum;
             res.json(JSON.stringify(friend));
-            console.log(friend);
         });
         //criteria
     });
@@ -178,7 +175,6 @@ module.exports = function (app, gestorBD) {
                             error: "Error al obtener los amigos "
                         });
                     } else {
-
                         if (friendships.length == 0) {
                             let users = [];
                             res.status(200);
@@ -226,8 +222,8 @@ module.exports = function (app, gestorBD) {
                                             } else
                                                 return true;
                                         })
+                                    });
 
-                                    })
                                     for (let i = 0; i < sortedUsers.length; i++) {
                                         let userSpecific = sortedUsers[i]._id.toString();
 
