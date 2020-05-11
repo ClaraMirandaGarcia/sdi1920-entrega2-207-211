@@ -37,8 +37,8 @@ import com.uniovi.tests.util.SeleniumUtils;
 public class SocianNetworkTest {
 
 	static String PathFirefox65 = "C:\\Program Files\\Mozilla Firefox\\firefox.exe";
-	static String Geckdriver024 = "C:\\Users\\CMG\\Desktop\\Tercero\\2_Cuatrimestre\\SDI\\Laboratorio\\Material\\PL-SDI-Sesión5-material\\PL-SDI-Sesión5-material\\geckodriver024win64.exe";
-//	static String Geckdriver024 = "C:\\Users\\AGM-PC\\Documents\\GitHub\\SDI\\PL-SDI-Sesión5-material\\geckodriver024win64.exe";
+//	static String Geckdriver024 = "C:\\Users\\CMG\\Desktop\\Tercero\\2_Cuatrimestre\\SDI\\Laboratorio\\Material\\PL-SDI-Sesión5-material\\PL-SDI-Sesión5-material\\geckodriver024win64.exe";
+	static String Geckdriver024 = "C:\\Users\\AGM-PC\\Documents\\GitHub\\SDI\\PL-SDI-Sesión5-material\\geckodriver024win64.exe";
 	static WebDriver driver = getDriver(PathFirefox65, Geckdriver024);
 	static String URL = "https://localhost:8081";
 
@@ -562,9 +562,13 @@ public class SocianNetworkTest {
 	// el estado leído.
 	@Test
 	public void PR29() {
+		PO_HomeView.loginApiForm(driver, "alejan1579@gmail.com", "123");
+		List<WebElement> row = PO_View.checkElement(driver, "id", "5eb58934a546330b2c522761");
+		row.get(0).findElement(By.className("friendData")).click();
 		String texto = "asdsad";
+		driver.navigate().to(URL);
 		PO_HomeView.loginApiForm(driver, "prueba1@prueba1.com", "123");
-		List<WebElement> row = PO_View.checkElement(driver, "id", "5eb6eaf87637800730cec57f");
+		row = PO_View.checkElement(driver, "id", "5eb6eaf87637800730cec57f");
 		row.get(0).findElement(By.className("friendData")).click();
 		String mensaje = "MensajeTest29";
 		WebElement search = driver.findElement(By.id("newMessage"));
