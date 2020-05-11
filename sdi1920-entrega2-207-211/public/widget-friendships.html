@@ -1,10 +1,12 @@
 <div id="widget-friendships">
 
+    <h2>Tus amigos</h2>
     <input type="text" class="form-control" placeholder="Buscar por nombre"
            id="name-filter"/>
-    <button class="btn" onclick="loadFriendships()">Actualizar</button>
+    <button id="refreshButton" class="btn" onclick="loadFriendships()">Actualizar</button>
 
-    <table class="table table-hover">
+
+    <table id="tableFriendship" class="table table-hover">
         <thead>
         <tr>
             <th>Nombre</th>
@@ -13,8 +15,10 @@
             <th class="col-md-1"></th>
         </tr>
         </thead>
+
         <tbody id="tablaCuerpo">
         </tbody>
+
     </table>
 </div>
 
@@ -36,6 +40,7 @@
                 actualizarTabla(friendships);
             },
             error: function (error) {
+                console.log(error);
                 $("#contenedor-principal").load("widget-login.html");
             }
         });
