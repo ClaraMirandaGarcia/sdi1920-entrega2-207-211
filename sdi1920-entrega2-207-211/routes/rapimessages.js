@@ -35,7 +35,6 @@ module.exports = function (app, gestorBD) {
             }]
         };
         gestorBD.obtainMessage(users, function (messages) {
-
             if (messages == null) {
                 res.status(500);
                 res.json({error: "conversación no encontrada"})
