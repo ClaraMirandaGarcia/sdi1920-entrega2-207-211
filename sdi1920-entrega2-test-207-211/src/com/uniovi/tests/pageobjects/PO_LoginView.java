@@ -16,7 +16,23 @@ public class PO_LoginView extends PO_NavView {
 		password.clear();
 		password.sendKeys(passwordp);
 		//Pulsar el boton de Alta.
+		
 		By boton = By.className("btn");
+		driver.findElement(boton).click();	
+	}
+	
+	static public void fillFormApi(WebDriver driver, String dnip, String passwordp) {
+		WebElement dni = driver.findElement(By.name("email"));
+		dni.click();
+		dni.clear();
+		dni.sendKeys(dnip);
+		WebElement password = driver.findElement(By.name("password"));
+		password.click();
+		password.clear();
+		password.sendKeys(passwordp);
+		//Pulsar el boton de Alta.
+		
+		By boton = By.id("boton-login");
 		driver.findElement(boton).click();	
 	}
 

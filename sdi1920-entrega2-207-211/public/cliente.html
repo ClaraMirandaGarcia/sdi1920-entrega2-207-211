@@ -22,8 +22,8 @@
         </div>
         <div class="collapse navbar-collapse" id="myNavbar">
             <ul id="mNavBar" class="nav navbar-nav">
-                <li id="mApp" class="btn">
-                    <a href="/">Aplicación</a>
+                <li id="volverApp" class="btn">
+                    <a href="/">Volver</a>
                 </li>
                 </li>
             </ul>
@@ -57,6 +57,7 @@
             $( "#contenedor-principal" ).load("widget-login.html");
         }
 
+
     }
 
     function clearNotifications() {
@@ -69,6 +70,12 @@
     function showNotification(text, style = "alert alert-danger"){
         clearNotifications();
         $("#notifications").prepend("<div class='"+style+"'>"+text+"</div>")
+    }
+
+    function conversacion(email) {
+        emailObjetivo = email;
+        $("#contenedor-principal").load("widget-conversacion.html");
+
     }
 
 

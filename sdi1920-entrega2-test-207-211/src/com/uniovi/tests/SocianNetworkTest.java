@@ -13,6 +13,7 @@ import org.junit.BeforeClass;
 import org.junit.FixMethodOrder;
 import org.junit.Test;
 import org.junit.runners.MethodSorters;
+import org.openqa.selenium.By;
 //Paquetes Selenium 
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -170,7 +171,8 @@ public class SocianNetworkTest {
 		PO_View.checkElement(driver, "text", "Identifícate");
 	}
 
-	// PR10. Comprobar que el botón cerrar sesión no está visible si el usuario no está autenticado.
+	// PR10. Comprobar que el botón cerrar sesión no está visible si el usuario no
+	// está autenticado.
 	@Test
 	public void PR10() {
 
@@ -183,7 +185,7 @@ public class SocianNetworkTest {
 
 		PO_View.checkElement(driver, "text", "Identifícate");
 		SeleniumUtils.textoNoPresentePagina(driver, "Desconectar");
-		
+
 	}
 
 	// PR11. Sin hacer /
@@ -192,7 +194,7 @@ public class SocianNetworkTest {
 		PO_HomeView.loginForm(driver, "class", "btn btn-primary", "login", "prueba1@prueba1.com", "123");
 		PO_View.checkElement(driver, "id", "tableUsers");
 
-		assertEquals(4, PO_PrivateView.countInPagination(driver, tableUsers));
+		assertEquals(4, PO_PrivateView.countInPagination(driver, "tableUsers"));
 
 		// logout
 		PO_HomeView.clickOption(driver, "logout", "class", "btn btn-primary");
@@ -279,14 +281,13 @@ public class SocianNetworkTest {
 		PO_HomeView.clickOption(driver, "logout", "class", "btn btn-primary");
 	}
 
-	
 	// [Prueba17] Mostrar el listado de invitaciones de amistad recibidas. Comprobar
 	// con un listado que contenga varias invitaciones recibidas.
 
 	@Test
 	public void PR17() {
 		// prueba2 ya ha recibido una petición -> enviamos otra
-		
+
 		// log as prueba3
 		PO_HomeView.loginForm(driver, "class", "btn btn-primary", "login", "prueba3@prueba3.com", "prueba3");
 		PO_View.checkElement(driver, "id", "tableUsers");
@@ -301,7 +302,7 @@ public class SocianNetworkTest {
 		// wait for message success
 		PO_View.checkElement(driver, "text", "Invitacion enviada");
 		// log out
-		 PO_HomeView.clickOption(driver, "logout", "class", "btn btn-primary");
+		PO_HomeView.clickOption(driver, "logout", "class", "btn btn-primary");
 
 		// Con prueba2 comprobamos que tengamos dos invitaciones.
 		PO_HomeView.loginForm(driver, "class", "btn btn-primary", "login", "prueba2@prueba2.com", "prueba2");
@@ -315,19 +316,18 @@ public class SocianNetworkTest {
 		assertEquals(2, PO_PrivateView.countInPagination(driver, "tableInvitations"));
 
 		// log out
-		 PO_HomeView.clickOption(driver, "logout", "class", "btn btn-primary");
+		PO_HomeView.clickOption(driver, "logout", "class", "btn btn-primary");
 
 	}
 
 	// [Prueba18] Sobre el listado de invitaciones recibidas. Hacer click en el
 	// botón/enlace de una de ellas y comprobar que dicha solicitud desaparece del
 	// listado de invitaciones.
-	
+
 	@Test
 	public void PR18() {
-		//Accedemos con prueba2 -> tiene dos invitaciones
-		
-		
+		// Accedemos con prueba2 -> tiene dos invitaciones
+
 		PO_HomeView.loginForm(driver, "class", "btn btn-primary", "login", "prueba2@prueba2.com", "prueba2");
 		PO_View.checkElement(driver, "id", "tableUsers");
 		PO_HomeView.clickOption(driver, "invitations");
@@ -337,12 +337,12 @@ public class SocianNetworkTest {
 		assertEquals(2, PO_PrivateView.countInPagination(driver, "tableInvitations"));
 
 		// aceptamos la de prueba3 -> Aceptar
-		
+
 		List<WebElement> elementos = PO_HomeView.checkElement(driver, "free",
 				"//td[contains(text(), 'prueba3')]/following-sibling::*/a[contains(@href, 'invitation/accept/')]");
 		elementos.get(0).click();
-		
-		//comprobamos que ha salido el mensaje Se ha añadido un amigo
+
+		// comprobamos que ha salido el mensaje Se ha añadido un amigo
 		PO_View.checkElement(driver, "text", "Se ha añadido un amigo");
 
 		// VOLVER A INVITATIONS
@@ -352,12 +352,9 @@ public class SocianNetworkTest {
 		// 1 invitaciones
 		assertEquals(1, PO_PrivateView.countInPagination(driver, "tableInvitations"));
 
-		
-		
+		// log out
+		PO_HomeView.clickOption(driver, "logout", "class", "btn btn-primary");
 
-	// log out
-	 PO_HomeView.clickOption(driver, "logout", "class", "btn btn-primary");
-		
 	}
 
 	// [Prueba19] Mostrar el listado de amigos de un usuario. Comprobar que el
@@ -376,9 +373,8 @@ public class SocianNetworkTest {
 		assertEquals(1, PO_PrivateView.countInPagination(driver, "tableFriendships"));
 		// log out
 		PO_HomeView.clickOption(driver, "logout", "class", "btn btn-primary");
-		
-		
-		//DELETE FROM DATABASE friendships && invitations
+
+		// DELETE FROM DATABASE friendships && invitations
 
 	}
 
@@ -400,28 +396,65 @@ public class SocianNetworkTest {
 		assertTrue("PR22 sin hacer", false);
 	}
 
-	// PR23. Sin hacer /
+	// [Prueba23] Inicio de sesión con datos válidos.
 	@Test
 	public void PR23() {
-		assertTrue("PR23 sin hacer", false);
+		PO_HomeView.clickOption(driver, "cliente.html");
+		PO_View.checkElement(driver, "id", "widget-login");
+		PO_LoginView.fillFormApi(driver, "prueba2@prueba2.com", "prueba2");
+		PO_View.checkElement(driver, "text", "Tus amigos");
 	}
 
-	// PR24. Sin hacer /
+	// [Prueba24] Inicio de sesión con datos inválidos (usuario no existente en la
+	// aplicación).
 	@Test
 	public void PR24() {
-		assertTrue("PR24 sin hacer", false);
+		PO_HomeView.clickOption(driver, "cliente.html");
+		PO_View.checkElement(driver, "id", "widget-login");
+		PO_LoginView.fillFormApi(driver, "emailInvalido", "passwordInvalido");
+		PO_View.checkElement(driver, "text", "No se ha encontrado a ese usuario");
 	}
 
-	// PR25. Sin hacer /
+	// [Prueba25] Acceder a la lista de amigos de un usuario, que al menos tenga
+	// tres amigos
 	@Test
 	public void PR25() {
-		assertTrue("PR25 sin hacer", false);
+		PO_HomeView.clickOption(driver, "cliente.html");
+		PO_View.checkElement(driver, "id", "widget-login");
+		PO_LoginView.fillFormApi(driver, "tengo3amigos@gmail.com", "tengo3amigos");
+		PO_View.checkElement(driver, "text", "Tus amigos");
+
+		// Check 3 friends
+		PO_View.checkElement(driver, "id", "tableFriendship");
+		SeleniumUtils.esperarSegundos(driver, 5);
+
+		assertEquals(3, PO_PrivateView.countInPagination(driver, "tableFriendship"));
+
 	}
 
-	// PR26. Sin hacer /
+//	[Prueba26] Acceder a la lista de amigos de un usuario, 
+//	y realizar un filtrado para encontrar a un amigo concreto, 
+//	el nombre a buscar debe coincidir con el de un amigo
+	
 	@Test
 	public void PR26() {
-		assertTrue("PR26 sin hacer", false);
+		PO_HomeView.clickOption(driver, "cliente.html");
+		PO_View.checkElement(driver, "id", "widget-login");
+		PO_LoginView.fillFormApi(driver, "tengo3amigos@gmail.com", "tengo3amigos");
+		PO_View.checkElement(driver, "text", "Tus amigos");
+		SeleniumUtils.esperarSegundos(driver, 5);
+		
+		//search for prueba2
+		//name-filter
+		//refreshButton
+		WebElement search = driver.findElement(By.id("name-filter"));
+		search.click();
+		search.clear();
+		search.sendKeys("prueba2");
+		
+		
+		SeleniumUtils.esperarSegundos(driver, 5);
+		assertEquals(1, PO_PrivateView.countInPagination(driver, "tableFriendship"));
 	}
 
 	// PR27. Sin hacer /

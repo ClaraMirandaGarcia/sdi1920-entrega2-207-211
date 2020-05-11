@@ -4,13 +4,14 @@ module.exports = function (app, gestorBD) {
         let users = {
             $or: [{
                 emisor: req.body.u1,
-                destino: req.body.u2
+                destino: res.usuario
             }, {
-                emisor: req.body.u2,
+                emisor: res.usuario,
                 destino: req.body.u1
             }]
         };
         gestorBD.obtainMessage(users, function (messages) {
+
             if (messages == null) {
                 res.status(500);
                 res.json({error: "conversación no encontrada"})
@@ -175,26 +176,40 @@ module.exports = function (app, gestorBD) {
                         });
                     } else {
 
-                        //check user
-                        let criterio = {
-                            $or: friendships.map((f) => {
-                                return {_id: gestorBD.mongo.ObjectID(f.userFrom.toString())}
-                            })
+                        if(friendships.length == 0){
+                            let users = [];
+
+                            res.status(200);
+                            res.json(JSON.stringify(users));
+
+                        } else{
+
+                            //check user
+                            let criterio = {
+                                $or: friendships.map((f) => {
+                                    return {_id: gestorBD.mongo.ObjectID(f.userFrom.toString())}
+                                })
+                            }
+
+                            gestorBD.getUsers(criterio, (users) => {
+
+                                if (users == null) {
+                                    //redirect?
+                                    res.status(500);
+                                    res.json({
+                                        error: "Error al listar los amigos "
+                                    });
+                                } else {
+
+
+                                    res.status(200);
+                                    res.json(JSON.stringify(users));
+                                }
+                            });
+
                         }
 
-                        gestorBD.getUsers(criterio, (users) => {
 
-                            if (users == null || users.length == 0) {
-                                //redirect?
-                                res.status(500);
-                                res.json({
-                                    error: "Error al listar los amigos "
-                                });
-                            } else {
-                                res.status(200);
-                                res.json(JSON.stringify(users));
-                            }
-                        });
                     }
                 });
 

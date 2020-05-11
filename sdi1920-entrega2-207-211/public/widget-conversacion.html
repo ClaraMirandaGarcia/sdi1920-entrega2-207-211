@@ -1,0 +1,76 @@
+<div id="widget-conversacion">
+
+    <table id="tableConversacion" class="table table-hover">
+        <thead>
+        <tr>
+            <th>Origen</th>
+            <th>Destino</th>
+            <th>Texto</th>
+            <th>Leido</th>
+            <th class="col-md-1"></th>
+        </tr>
+        </thead>
+
+        <tbody id="tablaCuerpo">
+        </tbody>
+
+    </table>
+
+    <input type="text" class="form-control" placeholder="Nuevo mensaje"
+           id="newMessage"/>
+    <button id="addMessage" class="btn" onclick="newMessage()">Enviar</button>
+</div>
+<script>
+    window.history.pushState("", "", "/cliente.html?w=conversacion");
+    function getConversacion(){
+        $.ajax({
+            url: URLbase + "/conversation",
+            type: "POST",
+            data: {"u1":emailObjetivo},
+            dataType: 'json',
+            headers: {"token": token},
+            success: function (mensajes) {
+                actualizarTabla(mensajes)
+            },
+            error: function (error) {
+                $("#contenedor-principal").load("widget-login.html");
+            }
+        });
+    }
+    getConversacion();
+    function actualizarTabla(mensajes) {
+        $("#tablaCuerpo").empty(); // Vaciar la tabla
+        for (i = 0; i < mensajes.length; i++) {
+            if (mensajes[i].destino !== emailObjetivo){
+                mensajes[i].leido = true;
+                markRead(mensajes[i]._id)
+            }
+            let read  = mensajes[i].leido ? "leído": "no leido";
+            $("#tablaCuerpo")
+                .append("<tr>"+
+                    "<td>" + mensajes[i].emisor + "</td>" +
+                    "<td>" + mensajes[i].destino + "</td>" +
+                    "<td>" + mensajes[i].texto + "</td>" +
+                    "<td>" +read + "</td>" +
+                    +"</tr>"
+                );
+        }
+    }
+    function markRead(_id){
+        $.ajax({
+            url: URLbase + "/message/markRead/" + _id,
+            type: "PUT",
+            data: {},
+            dataType: 'json',
+            headers: {"token": token},
+            error: function (error) {
+                $("#contenedor-principal").load("widget-login.html");
+            }
+        });
+    }
+    function newMessage() {
+
+    }
+    var x = setInterval(getConversacion ,1000);
+</script>
+
