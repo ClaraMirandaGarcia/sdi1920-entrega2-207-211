@@ -7,8 +7,6 @@ module.exports = function (app, swig, gestorBD) {
         };
         if (typeof req.session.usuario == "undefined" || req.session.usuario == null) {
             res.send("El usuario no está en sesión");
-            //ERROR MANAGEMENT
-            //TODO
         } else {
 
             let user_from = req.session.usuario;
@@ -68,9 +66,6 @@ module.exports = function (app, swig, gestorBD) {
                                         // NO FRIENDS ALREADY
                                         gestorBD.insertInvitation(invitation, function (id) {
                                             if (id == null) {
-
-                                                //ERROR MANAGEMENT
-                                                //TODO
                                                 res.redirect("/users" +
                                                     "?message=Hubo un error" +
                                                     "&messageType=alert-danger ");
@@ -106,9 +101,9 @@ module.exports = function (app, swig, gestorBD) {
 
             gestorBD.obtainInvitationsPg(criterio, pg, function (invitations, total) {
                 if (invitations == null) {
-                    //TODO error
+
                     res.redirect("/users" +
-                        "?mensaje=No hay ninguna invitación"+
+                        "?mensaje=Error interno"+
                         "&messageType=alert-warning ");
                 } else {
 
@@ -127,7 +122,7 @@ module.exports = function (app, swig, gestorBD) {
 
                         gestorBD.getUsers(criterio, function (users) {
                             if (users == null) {
-                                //TODO
+
                                 res.redirect("/users");
                             } else {
                                 manageInvitations(users, total, pg, req, res);
@@ -178,8 +173,9 @@ module.exports = function (app, swig, gestorBD) {
 
             gestorBD.eraseInvitation(criterioPetition, function (invitation) {
                 if (invitation == null) {
-                    //TODO
-                    res.send(respuesta);
+                    res.redirect("/users" +
+                        "?mensaje=Error interno"+
+                        "&messageType=alert-warning ");
                 } else {
 
                     // insert friendship
@@ -190,8 +186,9 @@ module.exports = function (app, swig, gestorBD) {
                     }
                     gestorBD.insertFriendship(friendship, function (id) {
                         if (id == null) {
-                            //TODO
-                            //there was an error adding?
+                            res.redirect("/users" +
+                                "?mensaje=Error interno"+
+                                "&messageType=alert-warning ");
                         } else {
                             //redirect to list of friends.
                             res.redirect("/friendships" +
