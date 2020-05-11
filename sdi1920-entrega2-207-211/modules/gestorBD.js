@@ -200,6 +200,25 @@ module.exports = {
         });
     },
 
+    updateDate: function(criterio, funcionCallback){
+        let date={};
+        date.dateUpdate = new Date();
+        this.mongo.MongoClient.connect(this.app.get('db'), function (err, db) {
+            if (err) {
+                funcionCallback(null);
+            } else {
+                let collection = db.collection('friendship');
+                collection.update(criterio, {$set: date}, function (err, result) {
+                    if (err) {
+                        funcionCallback(null);
+                    } else {
+                        funcionCallback(result);
+                    }
+                    db.close();
+                });
+            }
+        });
+    },
 
     //messages
     insertMessage: function (message, funcionCallback) {
@@ -258,5 +277,6 @@ module.exports = {
         });
 
     }
+
 
 };
