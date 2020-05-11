@@ -41,15 +41,32 @@
     function actualizarTabla(mensajes) {
         $("#tablaCuerpo").empty(); // Vaciar la tabla
         for (i = 0; i < mensajes.length; i++) {
+            if (mensajes[i].destino !== emailObjetivo){
+                mensajes[i].leido = true;
+                markRead(mensajes[i]._id)
+            }
+            let read  = mensajes[i].leido ? "leído": "no leido";
             $("#tablaCuerpo")
                 .append("<tr>"+
                     "<td>" + mensajes[i].emisor + "</td>" +
                     "<td>" + mensajes[i].destino + "</td>" +
                     "<td>" + mensajes[i].texto + "</td>" +
-                    "<td>" + mensajes[i].leido + "</td>" +
+                    "<td>" +read + "</td>" +
                     +"</tr>"
                 );
         }
+    }
+    function markRead(_id){
+        $.ajax({
+            url: URLbase + "/message/markRead/" + _id,
+            type: "PUT",
+            data: {},
+            dataType: 'json',
+            headers: {"token": token},
+            error: function (error) {
+                $("#contenedor-principal").load("widget-login.html");
+            }
+        });
     }
     function newMessage() {
 
