@@ -60,6 +60,7 @@
     }
 
     function unreadMessages() {
+
         frUnreadMessages = [];
         //iterate
         for (let i = 0; i < friendships.length; i++) {
@@ -74,7 +75,8 @@
 
                 success: function (respuesta) {
                     frUnreadMessages[i] = (JSON.parse(respuesta));
-                    actualizarTablaFriendship(frUnreadMessages);
+                    applyFilter(frUnreadMessages);
+                    //actualizarTablaFriendship(frUnreadMessages);
                 },
                 error: function (error) {
                     console.log(error);
@@ -87,7 +89,6 @@
 
     function actualizarTablaFriendship(friendships) {
         $("#tablaCuerpoAmigos").empty(); // Vaciar la tabla
-
         //let friendships = JSON.parse(amigosMostrar);
         let numMessages;
         for (i = 0; i < friendships.length; i++) {
@@ -105,13 +106,11 @@
         }
     }
 
-    loadFriendships();
-
-    $('#name-filter').on('input', function (e) {
+    function applyFilter(frUnreadMessages){
         var friendsResult = [];
         var filter = $("#name-filter").val();
 
-        let jsonFormat = friendships;
+        let jsonFormat = frUnreadMessages;
         for (i = 0; i < jsonFormat.length; i++) {
 
             if (jsonFormat[i].name.indexOf(filter) != -1) {
@@ -119,6 +118,12 @@
             }
         }
         actualizarTablaFriendship(friendsResult);
+    }
+
+    loadFriendships();
+
+    $('#name-filter').on('input', function (e) {
+        applyFilter();
     });
 
 
